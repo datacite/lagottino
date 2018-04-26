@@ -1,4 +1,4 @@
-class Api::EventsController < Api::BaseController
+class EventsController < ApplicationController
   prepend_before_action :authenticate_user!, :except => [:index, :show]
   before_action :load_event, only: [:show, :destroy]
   load_and_authorize_resource :except => [:create, :show, :index]
@@ -39,15 +39,19 @@ class Api::EventsController < Api::BaseController
 
     page = params[:page] || {}
     page[:number] = page[:number] && page[:number].to_i > 0 ? page[:number].to_i : 1
-    page[:size] = page[:size] && (1..1000).include?(page[:size].to_i) ? page[:size].to_i : 1000
+    page[:size] = page[:size] && (1..1000).include?(page[:size].to_i) ? page[:size].to_i : 25
+    total = collection.count
 
-    total = get_total_entries(params)
-    total_pages = (total / page[:size]).ceil
+    order = case params[:sort]
+            when "created" then "events.created_at"
+            when "name" then "events.uuid"
+            when "-name" then "events.uuid DESC"
+            else "events.created_at DESC"
+            end
 
-    @events = collection.order("updated_at DESC").page(page[:number]).per_page(page[:size])
+    @events = collection.order(order).page(page[:number]).per(page[:size])
 
-    meta = { total: @events.total_entries, 'total-pages' => @events.total_pages, page: page[:number].to_i }
-    render json: @events, meta: meta
+    render json: @events
   end
 
   def destroy

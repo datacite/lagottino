@@ -13,41 +13,79 @@ class Event < ActiveRecord::Base
   before_save :set_defaults
   after_commit :queue_event_job, :on => :create
 
-  # NB this is coupled to events_controller, event.rake
-  state_machine :initial => :waiting do
-    state :waiting, value: 0
-    state :working, value: 1
-    state :failed, value: 2
-    state :done, value: 3
+  # include state machine
+  include AASM
 
-    after_transition :to => [:failed, :done] do |event|
-      event.send_callback if event.callback.present?
-    end
+  aasm :whiny_transitions => false do
+    state :waiting, :initial => true
+    state :working, :failed, :done
 
-    after_transition :failed => :waiting do |event|
-      event.queue_event_job
-    end
+    # event :start do
+    #   transitions :from => :undetermined, :to => :draft, :after => Proc.new { set_to_inactive }
+    # end
 
-    # Reset after failure
-    event :reset do
-      transition [:failed] => :waiting
-      transition any => same
-    end
+    # event :register do
+    #   # can't register test prefix
+    #   transitions :from => [:undetermined, :draft], :to => :registered, :unless => :is_test_prefix?, :after => Proc.new { set_to_inactive }
 
-    event :start do
-      transition [:waiting] => :working
-      transition any => same
-    end
+    #   transitions :from => :undetermined, :to => :draft, :after => Proc.new { set_to_inactive }
+    # end
 
-    event :finish do
-      transition [:working] => :done
-      transition any => same
-    end
+    # event :publish do
+    #   # can't index test prefix
+    #   transitions :from => [:undetermined, :draft, :registered], :to => :findable, :unless => :is_test_prefix?, :after => Proc.new { set_to_active }
 
-    event :error do
-      transition any => :failed
-    end
+    #   transitions :from => :undetermined, :to => :draft, :after => Proc.new { set_to_inactive }
+    # end
+
+    # event :hide do
+    #   transitions :from => [:findable], :to => :registered, :after => Proc.new { set_to_inactive }
+    # end
+
+    # event :flag do
+    #   transitions :from => [:registered, :findable], :to => :flagged
+    # end
+
+    # event :link_check do
+    #   transitions :from => [:tombstoned, :registered, :findable, :flagged], :to => :broken
+    # end
   end
+
+  # NB this is coupled to events_controller, event.rake
+  # state_machine :initial => :waiting do
+  #   state :waiting, value: 0
+  #   state :working, value: 1
+  #   state :failed, value: 2
+  #   state :done, value: 3
+
+  #   after_transition :to => [:failed, :done] do |event|
+  #     event.send_callback if event.callback.present?
+  #   end
+
+  #   after_transition :failed => :waiting do |event|
+  #     event.queue_event_job
+  #   end
+
+  #   # Reset after failure
+  #   event :reset do
+  #     transition [:failed] => :waiting
+  #     transition any => same
+  #   end
+
+  #   event :start do
+  #     transition [:waiting] => :working
+  #     transition any => same
+  #   end
+
+  #   event :finish do
+  #     transition [:working] => :done
+  #     transition any => same
+  #   end
+
+  #   event :error do
+  #     transition any => :failed
+  #   end
+  # end
 
   serialize :subj, JSON
   serialize :obj, JSON
@@ -65,10 +103,6 @@ class Event < ActiveRecord::Base
   scope :stuck, -> { where(state: [0,1]).where("updated_at < ?", Time.zone.now - 24.hours).order_by_date }
   scope :done, -> { by_state(3).order_by_date }
   scope :total, ->(duration) { where(updated_at: (Time.zone.now.beginning_of_hour - duration.hours)..Time.zone.now.beginning_of_hour) }
-
-  def self.per_page
-    1000
-  end
 
   def to_param  # overridden, use uuid instead of id
     uuid

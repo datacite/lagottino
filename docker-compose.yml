@@ -1,7 +1,7 @@
 version: '2'
 
 services:
-  lagottino:
+  web:
     env_file: .env
     image: datacite/lagottino
     build: .
@@ -10,8 +10,11 @@ services:
     volumes:
       - ./app:/home/app/webapp/app
       - ./config:/home/app/webapp/config
+      - ./db:/home/app/webapp/db
       - ./lib:/home/app/webapp/lib
       - ./spec:/home/app/webapp/spec
+    networks:
+      - public
   memcached:
     image: memcached:1.4.31
   mysql:
@@ -22,3 +25,13 @@ services:
     image: mysql:5.7
     ports:
       - "3313:3306"
+    networks:
+      - public
+networks:
+  public:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 10.0.80.0/24
+        gateway: 10.0.80.1
