@@ -57,8 +57,8 @@ RUN mkdir -p vendor/bundle && \
 COPY . /home/app/webapp/
 RUN mkdir -p tmp/pids && \
     mkdir -p tmp/storage && \
-    chown -R app:app /home/app/webapp && \
-    chmod -R 755 /home/app/webapp
+    chown -R app:app . && \
+    chmod -R 755 .
 
 # Run additional scripts during container startup (i.e. not at build time)
 RUN mkdir -p /etc/my_init.d
