@@ -16,43 +16,24 @@ class Event < ActiveRecord::Base
     state :waiting, :initial => true
     state :working, :failed, :done
 
-    # event :start do
-    #   transitions :from => :undetermined, :to => :draft, :after => Proc.new { set_to_inactive }
-    # end
+    # Reset after failure
+    event :reset do
+      transitions from: [:failed], to: :waiting
+    end
 
-    # event :register do
-    #   # can't register test prefix
-    #   transitions :from => [:undetermined, :draft], :to => :registered, :unless => :is_test_prefix?, :after => Proc.new { set_to_inactive }
+    event :start do
+      transitions from: [:waiting], to: :working
+    end
 
-    #   transitions :from => :undetermined, :to => :draft, :after => Proc.new { set_to_inactive }
-    # end
+    event :finish do
+      transitions from: [:working], to: :done
+    end
 
-    # event :publish do
-    #   # can't index test prefix
-    #   transitions :from => [:undetermined, :draft, :registered], :to => :findable, :unless => :is_test_prefix?, :after => Proc.new { set_to_active }
-
-    #   transitions :from => :undetermined, :to => :draft, :after => Proc.new { set_to_inactive }
-    # end
-
-    # event :hide do
-    #   transitions :from => [:findable], :to => :registered, :after => Proc.new { set_to_inactive }
-    # end
-
-    # event :flag do
-    #   transitions :from => [:registered, :findable], :to => :flagged
-    # end
-
-    # event :link_check do
-    #   transitions :from => [:tombstoned, :registered, :findable, :flagged], :to => :broken
-    # end
+    event :error do
+      transitions to: :failed
+    end
   end
 
-  # NB this is coupled to events_controller, event.rake
-  # state_machine :initial => :waiting do
-  #   state :waiting, value: 0
-  #   state :working, value: 1
-  #   state :failed, value: 2
-  #   state :done, value: 3
 
   #   after_transition :to => [:failed, :done] do |event|
   #     event.send_callback if event.callback.present?
@@ -61,27 +42,6 @@ class Event < ActiveRecord::Base
   #   after_transition :failed => :waiting do |event|
   #     event.queue_event_job
   #   end
-
-  #   # Reset after failure
-  #   event :reset do
-  #     transition [:failed] => :waiting
-  #     transition any => same
-  #   end
-
-  #   event :start do
-  #     transition [:waiting] => :working
-  #     transition any => same
-  #   end
-
-  #   event :finish do
-  #     transition [:working] => :done
-  #     transition any => same
-  #   end
-
-  #   event :error do
-  #     transition any => :failed
-  #   end
-  # end
 
   serialize :subj, JSON
   serialize :obj, JSON
