@@ -1,24 +1,42 @@
-# README
+# DataCite Event Data API
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+[![Build Status](https://travis-ci.org/datacite/lagottino.svg?branch=master)](https://travis-ci.org/datacite/lagottino) [![Docker Build Status](https://img.shields.io/docker/build/datacite/lagottino.svg)](https://hub.docker.com/r/datacite/lagottino/)
 
-Things you may want to cover:
+## Installation
 
-* Ruby version
+Using Docker.
 
-* System dependencies
+```bash
+docker run -p 8085:80 datacite/lagottino
+```
 
-* Configuration
+or
 
-* Database creation
+```bash
+docker-compose up
+```
 
-* Database initialization
+You can now point your browser to `http://localhost:8085` and use the application. Some API endpoints require authentication.
 
-* How to run the test suite
+## Development
 
-* Services (job queues, cache servers, search engines, etc.)
+We use Rspec for testing:
 
-* Deployment instructions
+```bash
+bundle exec rspec
+```
 
-* ...
+Follow along via [Github Issues](https://github.com/datacite/lagottino/issues).
+
+### Note on Patches/Pull Requests
+
+* Fork the project
+* Write tests for your new feature or a test that reproduces a bug
+* Implement your feature or make a bug fix
+* Do not mess with Rakefile, version or history
+* Commit, push and make a pull request. Bonus points for topical branches.
+
+## License
+
+**Lagottino** is released under the [MIT License](https://github.com/datacite/lagottino/blob/master/LICENSE).
+
