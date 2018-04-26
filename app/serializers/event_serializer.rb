@@ -7,10 +7,14 @@ class EventSerializer < ActiveModel::Serializer
   end
 
   def state
-    object.human_state_name
+    object.aasm_state
   end
 
   def updated
-    object.updated_at
+    object.updated_at.iso8601
+  end
+
+  def occured_at
+    object.occured_at.iso8601
   end
 end

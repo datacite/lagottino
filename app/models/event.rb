@@ -5,10 +5,6 @@ class Event < ActiveRecord::Base
   # include event processing
   include Processable
 
-  belongs_to :work, inverse_of: :events, autosave: true, foreign_key: :subj_id, primary_key: :pid
-  belongs_to :related_work, class_name: "Work", inverse_of: :events, autosave: true, foreign_key: :obj_id, primary_key: :pid
-  belongs_to :source, primary_key: :name, inverse_of: :events
-
   before_create :create_uuid
   before_save :set_defaults
   after_commit :queue_event_job, :on => :create
@@ -92,9 +88,10 @@ class Event < ActiveRecord::Base
   serialize :error_messages, JSON
 
   validates :subj_id, :source_id, :source_token, presence: true
-  validates_associated :source
 
-  scope :by_state, ->(state) { where("state = ?", state) }
+  attr_accessor :container_title, :url
+
+  scope :by_state, ->(state) { where("aasm_state = ?", state) }
   scope :order_by_date, -> { order("updated_at DESC") }
 
   scope :waiting, -> { by_state(0).order_by_date }
@@ -108,15 +105,11 @@ class Event < ActiveRecord::Base
     uuid
   end
 
-  def source
-    cached_source(source_id)
-  end
-
   def send_callback
     data = { "data" => {
                "id" => uuid,
                "type" => "events",
-               "state" => human_state_name,
+               "state" => aasm_state,
                "errors" => error_messages,
                "message_action" => message_action,
                "source_token" => source_token,

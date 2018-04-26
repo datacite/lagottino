@@ -29,6 +29,7 @@ gem 'bugsnag', '~> 6.1', '>= 6.1.1'
 gem 'strip_attributes', '~> 1.8'
 gem 'slack-notifier', '~> 2.1'
 gem 'mini_magick', '~> 4.8'
+gem 'iso8601', '~> 0.10.1'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'rack-cors', '~> 1.0', '>= 1.0.2', :require => 'rack/cors'
 

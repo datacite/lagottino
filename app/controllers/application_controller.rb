@@ -40,21 +40,21 @@ class ApplicationController < ActionController::API
     request.format = :jsonapi if request.format.html?
   end
 
-  def authenticate_user!
-    type, credentials = type_and_credentials_from_request_headers
-    return false unless credentials.present?
+  def authenticate_user_from_token!
+    token = token_from_request_headers
+    return false unless token.present?
 
-    @current_user = User.new(credentials, type: type)
+    @current_user = User.new(token)
   end
 
   def current_ability
     @current_ability ||= Ability.new(current_user)
   end
 
-  # based on https://github.com/nsarno/knock/blob/master/lib/knock/authenticable.rb
-  def type_and_credentials_from_request_headers
+  # from https://github.com/nsarno/knock/blob/master/lib/knock/authenticable.rb
+  def token_from_request_headers
     unless request.headers['Authorization'].nil?
-      request.headers['Authorization'].split
+      request.headers['Authorization'].split.last
     end
   end
 

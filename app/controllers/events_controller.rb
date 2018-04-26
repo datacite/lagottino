@@ -1,5 +1,5 @@
 class EventsController < ApplicationController
-  prepend_before_action :authenticate_user!, :except => [:index, :show]
+  prepend_before_action :authenticate_user_from_token!, :except => [:index, :show]
   before_action :load_event, only: [:show, :destroy]
   load_and_authorize_resource :except => [:create, :show, :index]
   load_resource :except => [:create, :index]
@@ -85,8 +85,13 @@ class EventsController < ApplicationController
   private
 
   def safe_params
-    nested_params = [:pid, :name, { author: [:given, :family, :literal, :orcid] }, :title, :container_title, :issued, :published, :url, :doi, :type]
+    #fail ActionController::ParameterMissing, "param is missing or the value is empty: data" unless params[:data].present?
+    nested_params = [:pid, :name, { author: [:given, :family, :literal, :orcid] }, :title, "container-title", :issued, :published, :URL, :doi, :type]
     attributes = [:uuid, :message_action, :source_token, :callback, :subj_id, :obj_id, :relation_type_id, :source_id, :total, :occurred_at, subj: nested_params, obj: nested_params]
-    params.require(:data).permit(:id, :type, attributes: attributes)
+    p = params.require(:data).permit(:id, :type, attributes: attributes)
+    p.merge(
+      container_title: "container-title",
+      url: :URL
+    ).except("container-title")
   end
 end

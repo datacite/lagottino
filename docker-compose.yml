@@ -17,6 +17,8 @@ services:
       - public
   memcached:
     image: memcached:1.4.31
+    networks:
+      - public
   mysql:
     environment:
       MYSQL_DATABASE: lagotto

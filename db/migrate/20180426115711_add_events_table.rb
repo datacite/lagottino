@@ -38,4 +38,9 @@ class AddEventsTable < ActiveRecord::Migration[5.2]
 
     add_index "sources", ["name"], name: "index_sources_on_name", unique: true, using: :btree
   end
+
+  def down
+    drop_table :events
+    drop_table :sources
+  end
 end
