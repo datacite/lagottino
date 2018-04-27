@@ -14,23 +14,24 @@ describe "/events", :type => :request do
                     "type"=>"events",
                     "attributes"=>{
                       "state"=>"waiting",
-                      "message-action"=>"create",
-                      "source-token"=>"citeulike_123",
+                      "message_action"=>"create",
+                      "source_token"=>"citeulike_123",
                       "callback"=>nil,
-                      "subj-id"=>"http://www.citeulike.org/user/dbogartoit",
-                      "obj-id"=>"http://doi.org/10.1371/journal.pmed.0030186",
-                      "relation-type-id"=>"bookmarks",
-                      "source-id"=>"citeulike",
+                      "subj_id"=>"http://doi.org/10.1371/journal.pmed.0030186",
+                      "obj_id"=>"http://www.citeulike.org/user/dbogartoit",
+                      "relation_type_id"=>"bookmarks",
+                      "source_id"=>"citeulike",
                       "total"=>1,
-                      "occurred-at"=>"2015-04-08T00:00:00.000Z",
-                      "subj"=>{"pid"=>"http://www.citeulike.org/user/dbogartoit",
+                      "occurred_at"=>"2015-04-08T00:00:00.000Z",
+                      "subj"=>{},
+                      "obj"=> {"pid"=>"http://www.citeulike.org/user/dbogartoit",
                                "author"=>[{"given"=>"dbogartoit"}],
                                "title"=>"CiteULike bookmarks for user dbogartoit",
-                               "container-title"=>"CiteULike",
+                               "container_title"=>"CiteULike",
                                "issued"=>"2006-06-13T16:14:19Z",
                                "url"=>"http://www.citeulike.org/user/dbogartoit",
-                               "type"=>"entry"},
-                      "obj"=>{}}}}
+                               "type"=>"entry"}
+                      }}}
 
   let(:token) { User.generate_token(role_id: "staff_admin") }
   let(:uuid) { SecureRandom.uuid }
@@ -61,7 +62,7 @@ describe "/events", :type => :request do
 
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to be_nil
-        expect(response["data"]).to eq(success)
+        expect(response.dig("data", "attributes", "subj_id")).to eq("http://doi.org/10.1371/journal.pmed.0030186")
       end
     end
 
@@ -324,6 +325,7 @@ describe "/events", :type => :request do
         response = JSON.parse(last_response.body)
 
         expect(response["errors"]).to be_nil
+        puts success.to_json
         expect(response["data"]).to eq([success])
       end
     end

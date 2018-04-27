@@ -84,12 +84,8 @@ class EventsController < ApplicationController
 
   def safe_params
     #fail ActionController::ParameterMissing, "param is missing or the value is empty: data" unless params[:data].present?
-    nested_params = [:pid, :name, { author: [:given, :family, :literal, :orcid] }, :title, "container-title", :issued, :published, :URL, :doi, :type]
-    attributes = [:uuid, :message_action, :source_token, :callback, :subj_id, :obj_id, :relation_type_id, :source_id, :total, :occurred_at, subj: nested_params, obj: nested_params]
+    nested_params = [:pid, :name, { author: [:given, :family, :literal, :orcid] }, :title, :container_title, :issued, :published, :url, :doi, :type]
+    attributes = [:uuid, :message_action, :source_token, :callback, :subj_id, :obj_id, :relation_type_id, :source_id, :total, :occurred_at, :subj, subj: nested_params, obj: nested_params]
     p = params.require(:data).permit(:id, :type, attributes: attributes)
-    p.merge(
-      container_title: "container-title",
-      url: :URL
-    ).except("container-title")
   end
 end
