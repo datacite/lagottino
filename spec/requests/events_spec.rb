@@ -307,6 +307,86 @@ describe "/events", :type => :request do
         expect(response["data"]).to eq([success])
       end
     end
+
+    context "query by subj_id" do
+      let(:uri) { "/events?subj-id=#{event.subj_id}" }
+
+      # Exclude the token header.
+      let(:headers) do
+        { "HTTP_ACCEPT" => "application/json" }
+      end
+
+      it "s" do
+        get uri, nil, headers
+
+        expect(last_response.status).to eq(200)
+
+        response = JSON.parse(last_response.body)
+
+        expect(response["errors"]).to be_nil
+        expect(response["data"]).to eq([success])
+      end
+    end
+
+    context "query by unknown subj_id" do
+      let(:uri) { "/events?subj-id=xxx" }
+
+      # Exclude the token header.
+      let(:headers) do
+        { "HTTP_ACCEPT" => "application/json" }
+      end
+
+      it "s" do
+        get uri, nil, headers
+
+        expect(last_response.status).to eq(200)
+
+        response = JSON.parse(last_response.body)
+
+        expect(response["errors"]).to be_nil
+        expect(response["data"]).to be_empty
+      end
+    end
+
+    context "query by source_id" do
+      let(:uri) { "/events?source-id=citeulike" }
+
+      # Exclude the token header.
+      let(:headers) do
+        { "HTTP_ACCEPT" => "application/json" }
+      end
+
+      it "s" do
+        get uri, nil, headers
+
+        expect(last_response.status).to eq(200)
+
+        response = JSON.parse(last_response.body)
+
+        expect(response["errors"]).to be_nil
+        expect(response["data"]).to eq([success])
+      end
+    end
+
+    context "query by state" do
+      let(:uri) { "/events?state=waiting" }
+
+      # Exclude the token header.
+      let(:headers) do
+        { "HTTP_ACCEPT" => "application/json" }
+      end
+
+      it "s" do
+        get uri, nil, headers
+
+        expect(last_response.status).to eq(200)
+
+        response = JSON.parse(last_response.body)
+
+        expect(response["errors"]).to be_nil
+        expect(response["data"]).to eq([success])
+      end
+    end
   end
 
   context "destroy" do

@@ -27,20 +27,17 @@ class EventsController < ApplicationController
   end
 
   def index
-    collection = Event.all
-    collection = collection.where(source_token: params[:source_token]) if params[:source_token].present?
-
-    if params[:state]
-      # NB this is coupled to event.rb's state machine.
-      states = { "waiting" => 0, "working" => 1, "failed" => 2, "done" => 3 }
-      state = states.fetch(params[:state], 0)
-      collection = collection.where(state: state)
-    end
+    collection = Event
+    collection = collection.where(source_id: params[:source_id]) if params[:source_id].present?
+    collection = collection.where(aasm_state: params[:state]) if params[:state].present?
+    collection = collection.where(subj_id: params[:subj_id]) if params[:subj_id].present?
 
     page = params[:page] || {}
     page[:number] = page[:number] && page[:number].to_i > 0 ? page[:number].to_i : 1
     page[:size] = page[:size] && (1..1000).include?(page[:size].to_i) ? page[:size].to_i : 25
-    total = collection.count
+    
+    total = get_total_entries(params)
+    total_pages = (total / page[:size]).ceil
 
     order = case params[:sort]
             when "created" then "events.created_at"
@@ -51,7 +48,8 @@ class EventsController < ApplicationController
 
     @events = collection.order(order).page(page[:number]).per(page[:size])
 
-    render json: @events
+    meta = { total: total, 'total-pages' => total_pages, page: page[:number].to_i }
+    render json: @events, meta: meta
   end
 
   def destroy

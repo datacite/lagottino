@@ -87,12 +87,5 @@ module Lagottino
       config.active_job.queue_adapter = :inline
     end
     config.active_job.queue_name_prefix = Rails.env
-
-    config.middleware.insert_before 0, Rack::Cors do
-      allow do
-        origins '*'
-        resource '*', :headers => :any, :methods => [:head, :get, :post, :put, :patch, :delete, :options]
-      end
-    end
   end
 end
