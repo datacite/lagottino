@@ -53,6 +53,11 @@ RUN mkdir -p vendor/bundle && \
     gem install bundler && \
     /sbin/setuser app bundle install --path vendor/bundle
 
+# Install Ruby gems for middleman
+COPY vendor/middleman/Gemfile* /home/app/webapp/vendor/middleman/
+WORKDIR /home/app/webapp/vendor/middleman
+RUN /sbin/setuser app bundle install
+
 # Copy webapp folder
 COPY . /home/app/webapp/
 RUN mkdir -p tmp/pids && \
@@ -62,6 +67,7 @@ RUN mkdir -p tmp/pids && \
 
 # Run additional scripts during container startup (i.e. not at build time)
 RUN mkdir -p /etc/my_init.d
+COPY vendor/docker/60_index_page.sh /etc/my_init.d/70_index_page.sh
 
 # Expose web
 EXPOSE 80
