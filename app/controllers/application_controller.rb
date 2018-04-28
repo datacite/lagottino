@@ -37,7 +37,7 @@ class ApplicationController < ActionController::API
   end
 
   def default_format_json
-    request.format = :json if request.format.html?
+    request.format = :json
   end
 
   def authenticate_user_from_token!

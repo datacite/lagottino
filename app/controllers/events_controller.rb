@@ -5,7 +5,7 @@ class EventsController < ApplicationController
   load_resource :except => [:create, :index]
 
   def create
-    @event = Event.new(safe_params)
+    @event = Event.new(safe_params.except(:format))
     authorize! :create, @event
 
     if @event.save
@@ -80,6 +80,6 @@ class EventsController < ApplicationController
 
   def safe_params
     nested_params = [:pid, :name, { author: [:given, :family, :literal, :orcid] }, :title, :container_title, :issued, :published, :url, :doi, :type]
-    params.permit(:id, :uuid, :message_action, :source_token, :callback, :subj_id, :obj_id, :relation_type_id, :source_id, :total, :occurred_at, :subj, subj: nested_params, obj: nested_params)
+    params.permit(:id, :uuid, :message_action, :source_token, :callback, :subj_id, :obj_id, :relation_type_id, :source_id, :total, :occurred_at, :format, :subj, subj: nested_params, obj: nested_params)
   end
 end
