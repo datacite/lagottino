@@ -7,7 +7,7 @@ class Event < ActiveRecord::Base
 
   before_create :create_uuid
   before_save :set_defaults
-  after_commit :queue_event_job, :on => :create
+  # after_commit :queue_event_job, :on => :create
 
   # include state machine
   include AASM
@@ -53,14 +53,6 @@ class Event < ActiveRecord::Base
 
   scope :by_state, ->(state) { where("aasm_state = ?", state) }
   scope :order_by_date, -> { order("updated_at DESC") }
-
-  scope :waiting, -> { by_state(0).order_by_date }
-  scope :working, -> { by_state(1).order_by_date }
-  scope :failed, -> { by_state(2).order_by_date }
-  scope :stuck, -> { where(state: [0,1]).where("updated_at < ?", Time.zone.now - 24.hours).order_by_date }
-  scope :done, -> { by_state(3).order_by_date }
-  scope :total, ->(duration) { where(updated_at: (Time.zone.now.beginning_of_hour - duration.hours)..Time.zone.now.beginning_of_hour) }
-
   def to_param  # overridden, use uuid instead of id
     uuid
   end
@@ -80,6 +72,10 @@ class Event < ActiveRecord::Base
 
   def timestamp
     updated_at.utc.iso8601 if updated_at.present?
+  end
+
+  def license
+    "https://creativecommons.org/publicdomain/zero/1.0/"
   end
 
   def cache_key

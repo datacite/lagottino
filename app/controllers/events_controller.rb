@@ -5,18 +5,14 @@ class EventsController < ApplicationController
   load_resource :except => [:create, :index]
 
   def create
-    unless safe_params.key? :type
-      render json: { errors: [{ status: 422, title: "Missing attribute: type."}] }, status: :unprocessable_entity
-    else
-      @event = Event.new(safe_params.except(:type))
-      authorize! :create, @event
+    @event = Event.new(safe_params)
+    authorize! :create, @event
 
-      if @event.save
-        render json: @event, :status => :created
-      else
-        errors = @event.errors.full_messages.map { |message| { status: 422, title: message } }
-        render json: { errors: errors }, status: :unprocessable_entity
-      end
+    if @event.save
+      render json: @event, :status => :created
+    else
+      errors = @event.errors.full_messages.map { |message| { status: 422, title: message } }
+      render json: { errors: errors }, status: :unprocessable_entity
     end
   rescue ActiveRecord::RecordNotUnique
     render json: @event, :status => :created
@@ -83,9 +79,7 @@ class EventsController < ApplicationController
   private
 
   def safe_params
-    #fail ActionController::ParameterMissing, "param is missing or the value is empty: data" unless params[:data].present?
     nested_params = [:pid, :name, { author: [:given, :family, :literal, :orcid] }, :title, :container_title, :issued, :published, :url, :doi, :type]
-    attributes = [:uuid, :message_action, :source_token, :callback, :subj_id, :obj_id, :relation_type_id, :source_id, :total, :occurred_at, :subj, subj: nested_params, obj: nested_params]
-    p = params.require(:data).permit(:id, :type, attributes: attributes)
+    params.permit(:id, :uuid, :message_action, :source_token, :callback, :subj_id, :obj_id, :relation_type_id, :source_id, :total, :occurred_at, :subj, subj: nested_params, obj: nested_params)
   end
 end

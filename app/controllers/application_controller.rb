@@ -10,7 +10,7 @@ class ApplicationController < ActionController::API
 
   before_bugsnag_notify :add_user_info_to_bugsnag
 
-  before_action :default_format_jsonapi, :transform_params
+  before_action :default_format_json, :transform_params
   after_action :set_jsonp_format, :set_consumer_header
 
   # from https://github.com/spree/spree/blob/master/api/app/controllers/spree/api/base_controller.rb
@@ -36,8 +36,8 @@ class ApplicationController < ActionController::API
     params.transform_keys! { |key| key.tr('-', '_') }
   end
 
-  def default_format_jsonapi
-    request.format = :jsonapi if request.format.html?
+  def default_format_json
+    request.format = :json if request.format.html?
   end
 
   def authenticate_user_from_token!
