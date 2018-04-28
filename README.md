@@ -1,7 +1,6 @@
 # DataCite Event Data API
 
-[![Build Status](https://travis-ci.org/datacite/lagottino.svg?branch=master)](https://travis-ci.org/datacite/lagottino) [![Docker Build Status](https://img.shields.io/docker/build/datacite/lagottino.svg)](https://hub.docker.com/r/datacite/lagottino/)
-
+[![Build Status](https://travis-ci.org/datacite/lagottino.svg?branch=master)](https://travis-ci.org/datacite/lagottino) [![Docker Build Status](https://img.shields.io/docker/build/datacite/lagottino.svg)](https://hub.docker.com/r/datacite/lagottino/) [![Maintainability](https://api.codeclimate.com/v1/badges/37f15ec443bc203a406f/maintainability)](https://codeclimate.com/github/datacite/lagottino/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/37f15ec443bc203a406f/test_coverage)](https://codeclimate.com/github/datacite/lagottino/test_coverage)
 ## Installation
 
 Using Docker.
