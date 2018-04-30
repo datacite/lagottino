@@ -1,8 +1,0 @@
-source 'https://rubygems.org'
-
-# Middleman Gems
-gem 'middleman', "~> 4.1"
-gem 'tilt-handlebars', '~> 1.4'
-gem 'middleman-data_source', '~> 0.8.1'
-gem 'middleman-livereload'
-gem 'middleman-syntax', '~> 2.0'

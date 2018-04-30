@@ -25,8 +25,7 @@ class EventsController < ApplicationController
   def index
     collection = Event
     collection = collection.where(source_id: params[:source_id]) if params[:source_id].present?
-    collection = collection.where(aasm_state: params[:state]) if params[:state].present?
-    collection = collection.where(subj_id: params[:subj_id]) if params[:subj_id].present?
+    collection = collection.where(obj_id: params[:obj_id]) if params[:obj_id].present?
 
     page = params[:page] || {}
     page[:number] = page[:number] && page[:number].to_i > 0 ? page[:number].to_i : 1
@@ -62,7 +61,6 @@ class EventsController < ApplicationController
     case
     when params[:source_token] && params[:state] then Event.cached_event_source_token_state_count(params[:source_token], params[:state])
     when params[:source_token] then Event.cached_event_source_token_count(params[:source_token])
-    when params[:state] then Event.cached_event_state_count(params[:state])
     when Rails.env.development? || Rails.env.test? then Event.count
     else Event.cached_event_count
     end
@@ -79,7 +77,9 @@ class EventsController < ApplicationController
   private
 
   def safe_params
-    nested_params = [:pid, :name, { author: [:given, :family, :literal, :orcid] }, :title, :container_title, :issued, :published, :url, :doi, :type]
-    params.permit(:id, :uuid, :message_action, :source_token, :callback, :subj_id, :obj_id, :relation_type_id, :source_id, :total, :occurred_at, :format, :subj, subj: nested_params, obj: nested_params)
+    nested_params = [:pid, :name, { author: [:given, :family, :literal, :orcid] }, :title, "container-title", :issued, :published, :url, :doi, :type]
+    ActiveModelSerializers::Deserialization.jsonapi_parse!(
+      params, only: [:uuid, "message-action", "source-token", :callback, "subj-id", "obj-id", "relation-type-id", "source-id", :total, :license, "occurred-at", :subj, :obj, subj: nested_params, obj: nested_params]        
+    )
   end
 end

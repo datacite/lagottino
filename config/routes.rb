@@ -5,5 +5,4 @@ Rails.application.routes.draw do
   resources :heartbeat, only: [:index]
 
   resources :events
-  resources :sources
 end

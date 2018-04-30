@@ -1,6 +1,6 @@
 class EventSerializer < ActiveModel::Serializer
   cache key: 'event'
-  attributes :id, :subj_id, :obj_id, :message_action, :source_token, :relation_type_id, :source_id, :total, :license, :occurred_at, :timestamp, :subj, :obj
+  attributes :subj_id, :obj_id, :message_action, :source_token, :relation_type_id, :source_id, :total, :license, :occurred_at, :timestamp, :subj, :obj
 
   def id
     object.to_param

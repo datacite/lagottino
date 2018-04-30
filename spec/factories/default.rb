@@ -3,16 +3,16 @@ FactoryBot.define do
     uuid { SecureRandom.uuid }
     source_id "citeulike"
     source_token "citeulike_123"
-    subj_id "http://doi.org/10.1371/journal.pmed.0030186"
-    obj_id "http://www.citeulike.org/user/dbogartoit"
-    subj {}
-    obj {{ "pid"=>"http://www.citeulike.org/user/dbogartoit",
+    subj_id "http://www.citeulike.org/user/dbogartoit"
+    obj_id "http://doi.org/10.1371/journal.pmed.0030186"
+    subj {{ "pid"=>"http://www.citeulike.org/user/dbogartoit",
             "author"=>[{ "given"=>"dbogartoit" }],
             "title"=>"CiteULike bookmarks for user dbogartoit",
-            "container_title"=>"CiteULike",
+            "container-title"=>"CiteULike",
             "issued"=>"2006-06-13T16:14:19Z",
             "url"=>"http://www.citeulike.org/user/dbogartoit",
             "type"=>"entry" }}
+    obj {}
     relation_type_id "bookmarks"
     updated_at { Time.zone.now }
     occurred_at { Time.zone.now }

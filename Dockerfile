@@ -56,14 +56,10 @@ RUN gem update --system && \
     gem install bundler && \
     /sbin/setuser app bundle install --path vendor/bundle
 
-# Install Ruby gems for middleman
-WORKDIR /home/app/webapp/vendor/middleman
-RUN /sbin/setuser app bundle install
-
 # Run additional scripts during container startup (i.e. not at build time)
 WORKDIR /home/app/webapp
 RUN mkdir -p /etc/my_init.d
-COPY vendor/docker/60_index_page.sh /etc/my_init.d/60_index_page.sh
+COPY vendor/docker/90_migrate.sh /etc/my_init.d/90_migrate.sh
 
 # Expose web
 EXPOSE 80

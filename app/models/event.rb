@@ -53,6 +53,7 @@ class Event < ActiveRecord::Base
 
   scope :by_state, ->(state) { where("aasm_state = ?", state) }
   scope :order_by_date, -> { order("updated_at DESC") }
+  
   def to_param  # overridden, use uuid instead of id
     uuid
   end
@@ -74,10 +75,6 @@ class Event < ActiveRecord::Base
     updated_at.utc.iso8601 if updated_at.present?
   end
 
-  def license
-    "https://creativecommons.org/publicdomain/zero/1.0/"
-  end
-
   def cache_key
     "events/#{uuid}-#{timestamp}"
   end
@@ -92,5 +89,6 @@ class Event < ActiveRecord::Base
     write_attribute(:total, 1) if total.blank?
     write_attribute(:relation_type_id, "references") if relation_type_id.blank?
     write_attribute(:occurred_at, Time.zone.now.utc) if occurred_at.blank?
+    write_attribute(:license, "https://creativecommons.org/publicdomain/zero/1.0/") if license.blank?
   end
 end

@@ -11,25 +11,26 @@ describe "/events", :type => :request do
 
   # Successful response from creating via the API.
   let(:success) { { "id"=> event.uuid,
-                    "subj_id"=>"http://doi.org/10.1371/journal.pmed.0030186",
-                    "obj_id"=>"http://www.citeulike.org/user/dbogartoit",
-                    "message_action"=>"create",
-                    "source_token"=>"citeulike_123",
-                    "relation_type_id"=>"bookmarks",
-                    "source_id"=>"citeulike",
-                    "total"=>1,
-                    "license"=>"https://creativecommons.org/publicdomain/zero/1.0/",
-                    "occurred_at"=>"2015-04-08T00:00:00.000Z",
-                    "timestamp"=>"2015-04-08T00:00:00Z",
-                    "subj"=>{},
-                    "obj"=> {"pid"=>"http://www.citeulike.org/user/dbogartoit",
-                              "author"=>[{"given"=>"dbogartoit"}],
-                              "title"=>"CiteULike bookmarks for user dbogartoit",
-                              "container_title"=>"CiteULike",
-                              "issued"=>"2006-06-13T16:14:19Z",
-                              "url"=>"http://www.citeulike.org/user/dbogartoit",
-                              "type"=>"entry"}
-                    }}
+                    "type"=>"events",
+                    "attributes"=>{
+                      "subj-id"=>"http://www.citeulike.org/user/dbogartoit",
+                      "obj-id"=>"http://doi.org/10.1371/journal.pmed.0030186",
+                      "message-action"=>"create",
+                      "source-token"=>"citeulike_123",
+                      "relation-type-id"=>"bookmarks",
+                      "source-id"=>"citeulike",
+                      "total"=>1,
+                      "license"=>"https://creativecommons.org/publicdomain/zero/1.0/",
+                      "occurred-at"=>"2015-04-08T00:00:00.000Z",
+                      "subj"=> {"pid"=>"http://www.citeulike.org/user/dbogartoit",
+                               "author"=>[{"given"=>"dbogartoit"}],
+                               "title"=>"CiteULike bookmarks for user dbogartoit",
+                               "container-title"=>"CiteULike",
+                               "issued"=>"2006-06-13T16:14:19Z",
+                               "url"=>"http://www.citeulike.org/user/dbogartoit",
+                               "type"=>"entry"
+                      },
+                      "obj"=>{}}}}
 
   let(:token) { User.generate_token(role_id: "staff_admin") }
   let(:uuid) { SecureRandom.uuid }
@@ -41,24 +42,26 @@ describe "/events", :type => :request do
   context "create" do
     let(:uri) { "/events" }
     let(:params) do
-      { 
-        "uuid" => event.uuid,
-        "subj_id" => event.subj_id,
-        "subj" => event.subj,
-        "obj_id" => event.obj_id,
-        "relation_type_id" => event.relation_type_id,
-        "source_id" => event.source_id,
-        "source_token" => event.source_token }
+      { "data" => { "type" => "events",
+                    "attributes" => {
+                      "uuid" => event.uuid,
+                      "subj-id" => event.subj_id,
+                      "subj" => event.subj,
+                      "obj-id" => event.obj_id,
+                      "relation-type-id" => event.relation_type_id,
+                      "source-id" => event.source_id,
+                      "source-token" => event.source_token } } }
     end
 
     context "as admin user" do
       it "JSON" do
         post uri, params, headers
+
         expect(last_response.status).to eq(201)
 
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to be_nil
-        expect(response.dig("event", "subj_id")).to eq("http://doi.org/10.1371/journal.pmed.0030186")
+        expect(response.dig("data", "attributes", "subj-id")).to eq("http://www.citeulike.org/user/dbogartoit")
       end
     end
 
@@ -71,7 +74,7 @@ describe "/events", :type => :request do
 
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to eq(errors)
-        expect(response["event"]).to be_nil
+        expect(response["data"]).to be_nil
       end
     end
 
@@ -84,16 +87,17 @@ describe "/events", :type => :request do
 
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to eq(errors)
-        expect(response["event"]).to be_blank
+        expect(response["data"]).to be_blank
       end
     end
 
-    context "without source_token" do
+    context "without source-token" do
       let(:params) do
-        { 
-          "uuid" => uuid,
-          "subj_id" => event.subj_id,
-          "source_id" => event.source_id }
+        { "data" => { "type" => "events",
+                      "attributes" => {
+                        "uuid" => uuid,
+                        "subj-id" => event.subj_id,
+                        "source-id" => event.source_id } } }
       end
 
       it "JSON" do
@@ -102,16 +106,17 @@ describe "/events", :type => :request do
 
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to eq([{"status"=>422, "title"=>"Source token can't be blank"}])
-        expect(response["event"]).to be_nil
+        expect(response["data"]).to be_nil
       end
     end
 
-    context "without source_id" do
+    context "without source-id" do
       let(:params) do
-        { 
-          "uuid" => uuid,
-          "subj_id" => event.subj_id,
-          "source_token" => event.source_token }
+        { "data" => { "type" => "events",
+                      "attributes" => {
+                        "uuid" => uuid,
+                        "subj-id" => event.subj_id,
+                        "source-token" => event.source_token } } }
       end
 
       it "JSON" do
@@ -120,16 +125,17 @@ describe "/events", :type => :request do
 
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to eq([{"status"=>422, "title"=>"Source can't be blank"}])
-        expect(response["event"]).to be_blank
+        expect(response["data"]).to be_blank
       end
     end
 
-    context "without subj_id" do
+    context "without subj-id" do
       let(:params) do
-        { 
-          "uuid" => uuid,
-          "source_id" => event.source_id,
-          "source_token" => event.source_token }
+        { "data" => { "type" => "events",
+                      "attributes" => {
+                        "uuid" => uuid,
+                        "source-id" => event.source_id,
+                        "source-token" => event.source_token } } }
       end
 
       it "JSON" do
@@ -138,7 +144,7 @@ describe "/events", :type => :request do
 
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to eq([{"status"=>422, "title"=>"Subj can't be blank"}])
-        expect(response["event"]).to be_blank
+        expect(response["data"]).to be_blank
       end
     end
 
@@ -154,18 +160,16 @@ describe "/events", :type => :request do
 
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to eq(errors)
-        expect(response["event"]).to be_nil
+        expect(response["data"]).to be_blank
       end
     end
 
-    context "with unpermitted params" do
+    context "with missing data param" do
       let(:params) do
-        { 
-          "uuid" => uuid,
-          "subj_id" => event.subj_id,
-          "source_id" => event.source_id,
-          "source_token" => event.source_token,
-          "foo" => "bar" }
+        { "event" => { "type" => "events",
+                         "attributes" => {
+                           "uuid" => uuid,
+                           "source-token" => "123" } } }
       end
 
       it "JSON" do
@@ -173,13 +177,13 @@ describe "/events", :type => :request do
         expect(last_response.status).to eq(422)
 
         response = JSON.parse(last_response.body)
-        expect(response["errors"]).to eq([{"status"=>"422", "title"=>"found unpermitted parameter: :foo"}])
-        expect(response["event"]).to be_blank
+        expect(response.dig("errors", 0, "title")).to start_with("Invalid payload")
+        expect(response["data"]).to be_blank
       end
     end
 
     context "with params in wrong format" do
-      let(:params) { { "title" => "10.1371/journal.pone.0036790 2012-05-15 New Dromaeosaurids (Dinosauria: Theropoda) from the Lower Cretaceous of Utah, and the Evolution of the Dromaeosaurid Tail" } }
+      let(:params) { { "data" => "10.1371/journal.pone.0036790 2012-05-15 New Dromaeosaurids (Dinosauria: Theropoda) from the Lower Cretaceous of Utah, and the Evolution of the Dromaeosaurid Tail" } }
 
       it "JSON" do
         post uri, params, headers
@@ -187,8 +191,8 @@ describe "/events", :type => :request do
         response = JSON.parse(last_response.body)
         error = response["errors"].first
         expect(error["status"]).to eq("422")
-        expect(error["title"]).to start_with("found unpermitted parameter: :title")
-        expect(response["event"]).to be_nil
+        expect(error["title"]).to start_with("Invalid payload")
+        expect(response["data"]).to be_blank
       end
     end
   end
@@ -203,8 +207,8 @@ describe "/events", :type => :request do
         expect(last_response.status).to eq(200)
 
         response = JSON.parse(last_response.body)
-        expect(response["errors"]).to be_nil
-        expect(response["event"]).to eq(success)
+        attributes = response.dig("data", "attributes")
+        expect(attributes["subj-id"]).to eq(event.subj_id)
       end
     end
 
@@ -216,8 +220,8 @@ describe "/events", :type => :request do
         expect(last_response.status).to eq(200)
 
         response = JSON.parse(last_response.body)
-        expect(response["errors"]).to be_nil
-        expect(response["event"]).to eq(success)
+        attributes = response.dig("data", "attributes")
+        expect(attributes["subj-id"]).to eq(event.subj_id)
       end
     end
 
@@ -229,8 +233,8 @@ describe "/events", :type => :request do
         expect(last_response.status).to eq(200)
 
         response = JSON.parse(last_response.body)
-        expect(response["errors"]).to be_nil
-        expect(response["event"]).to eq(success)
+        attributes = response.dig("data", "attributes")
+        expect(attributes["subj-id"]).to eq(event.subj_id)
       end
     end
 
@@ -243,7 +247,7 @@ describe "/events", :type => :request do
 
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to eq([{"status"=>"404", "title"=>"The resource you are looking for doesn't exist."}])
-        expect(response["events"]).to be_nil
+        expect(response["data"]).to be_nil
       end
     end
   end
@@ -263,27 +267,21 @@ describe "/events", :type => :request do
       it "JSON" do
         get uri, nil, headers
 
-        expect(last_response.status).to eq(200)
-
         response = JSON.parse(last_response.body)
-
-        expect(response["errors"]).to be_nil
-        expect(response["events"]).to eq([success])
+        attributes = response.dig("data", 0, "attributes")
+        expect(attributes["subj-id"]).to eq(event.subj_id)
       end
 
       it "No accept header" do
         get uri
 
-        expect(last_response.status).to eq(200)
-
         response = JSON.parse(last_response.body)
-
-        expect(response["errors"]).to be_nil
-        expect(response["events"]).to eq([success])
+        attributes = response.dig("data", 0, "attributes")
+        expect(attributes["subj-id"]).to eq(event.subj_id)
       end
     end
 
-    context "query by subj_id" do
+    context "query by subj-id" do
       let(:uri) { "/events?subj-id=#{event.subj_id}" }
 
       # Exclude the token header.
@@ -297,14 +295,13 @@ describe "/events", :type => :request do
         expect(last_response.status).to eq(200)
 
         response = JSON.parse(last_response.body)
-
-        expect(response["errors"]).to be_nil
-        expect(response["events"]).to eq([success])
+        attributes = response.dig("data", 0, "attributes")
+        expect(attributes["subj-id"]).to eq(event.subj_id)
       end
     end
 
-    context "query by unknown subj_id" do
-      let(:uri) { "/events?subj-id=xxx" }
+    context "query by unknown obj-id" do
+      let(:uri) { "/events?obj-id=xxx" }
 
       # Exclude the token header.
       let(:headers) do
@@ -319,11 +316,11 @@ describe "/events", :type => :request do
         response = JSON.parse(last_response.body)
 
         expect(response["errors"]).to be_nil
-        expect(response["events"]).to be_empty
+        expect(response["data"]).to be_empty
       end
     end
 
-    context "query by source_id" do
+    context "query by source-id" do
       let(:uri) { "/events?source-id=citeulike" }
 
       # Exclude the token header.
@@ -331,35 +328,14 @@ describe "/events", :type => :request do
         { "HTTP_ACCEPT" => "application/json" }
       end
 
-      it "s" do
+      it "json" do
         get uri, nil, headers
 
         expect(last_response.status).to eq(200)
 
         response = JSON.parse(last_response.body)
-
-        expect(response["errors"]).to be_nil
-        expect(response["events"]).to eq([success])
-      end
-    end
-
-    context "query by state" do
-      let(:uri) { "/events?state=waiting" }
-
-      # Exclude the token header.
-      let(:headers) do
-        { "HTTP_ACCEPT" => "application/json" }
-      end
-
-      it "s" do
-        get uri, nil, headers
-
-        expect(last_response.status).to eq(200)
-
-        response = JSON.parse(last_response.body)
-
-        expect(response["errors"]).to be_nil
-        expect(response["events"]).to eq([success])
+        attributes = response.dig("data", 0, "attributes")
+        expect(attributes["subj-id"]).to eq(event.subj_id)
       end
     end
   end
@@ -375,7 +351,7 @@ describe "/events", :type => :request do
 
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to be_nil
-        expect(response["events"]).to be_nil
+        expect(response["data"]).to eq({})
       end
     end
 
@@ -388,7 +364,7 @@ describe "/events", :type => :request do
 
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to eq(errors)
-        expect(response["events"]).to be_nil
+        expect(response["data"]).to be_nil
       end
     end
 
@@ -401,7 +377,7 @@ describe "/events", :type => :request do
 
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to eq(errors)
-        expect(response["events"]).to be_nil
+        expect(response["data"]).to be_nil
       end
     end
 
@@ -417,7 +393,7 @@ describe "/events", :type => :request do
 
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to eq(errors)
-        expect(response["events"]).to be_nil
+        expect(response["data"]).to be_nil
       end
     end
 
@@ -430,7 +406,7 @@ describe "/events", :type => :request do
 
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to eq([{"status"=>"404", "title"=>"The resource you are looking for doesn't exist."}])
-        expect(response["events"]).to be_nil
+        expect(response["data"]).to be_nil
       end
     end
   end
