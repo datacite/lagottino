@@ -5,8 +5,11 @@ class Event < ActiveRecord::Base
   # include event processing
   include Processable
 
+  # include doi normalization
+  include Identifiable
+
   before_create :create_uuid
-  before_save :set_defaults
+  before_validation :set_defaults
   # after_commit :queue_event_job, :on => :create
 
   # include state machine
@@ -53,7 +56,7 @@ class Event < ActiveRecord::Base
 
   scope :by_state, ->(state) { where("aasm_state = ?", state) }
   scope :order_by_date, -> { order("updated_at DESC") }
-  
+
   def to_param  # overridden, use uuid instead of id
     uuid
   end
@@ -84,11 +87,13 @@ class Event < ActiveRecord::Base
   end
 
   def set_defaults
-    write_attribute(:subj, {}) if subj.blank?
-    write_attribute(:obj, {}) if obj.blank?
-    write_attribute(:total, 1) if total.blank?
-    write_attribute(:relation_type_id, "references") if relation_type_id.blank?
-    write_attribute(:occurred_at, Time.zone.now.utc) if occurred_at.blank?
-    write_attribute(:license, "https://creativecommons.org/publicdomain/zero/1.0/") if license.blank?
+    self.subj_id = normalize_doi(subj_id) || subj_id
+    self.obj_id = normalize_doi(obj_id) || obj_id
+    self.subj = {} if subj.blank?
+    self.obj = {} if obj.blank?
+    self.total = 1 if total.blank?
+    self.relation_type_id = "references" if relation_type_id.blank?
+    self.occurred_at = Time.zone.now.utc if occurred_at.blank?
+    self.license = "https://creativecommons.org/publicdomain/zero/1.0/" if license.blank?
   end
 end

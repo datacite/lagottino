@@ -1,4 +1,7 @@
 class EventsController < ApplicationController
+
+  include Identifiable
+
   prepend_before_action :authenticate_user_from_token!, :except => [:index, :show]
   before_action :load_event, only: [:show, :destroy]
   load_and_authorize_resource :except => [:create, :show, :index]
@@ -23,9 +26,12 @@ class EventsController < ApplicationController
   end
 
   def index
+    # support doi as alias for obj_id
+    params[:obj_id] ||= params[:doi]
+
     collection = Event
     collection = collection.where(source_id: params[:source_id]) if params[:source_id].present?
-    collection = collection.where(obj_id: params[:obj_id]) if params[:obj_id].present?
+    collection = collection.where(obj_id: normalize_doi(params[:obj_id])) if params[:obj_id].present?
 
     page = params[:page] || {}
     page[:number] = page[:number] && page[:number].to_i > 0 ? page[:number].to_i : 1

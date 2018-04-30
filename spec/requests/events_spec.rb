@@ -281,22 +281,64 @@ describe "/events", :type => :request do
       end
     end
 
-    context "query by subj-id" do
-      let(:uri) { "/events?subj-id=#{event.subj_id}" }
+    context "query by obj-id" do
+      let(:uri) { "/events?obj-id=#{event.obj_id}" }
 
       # Exclude the token header.
       let(:headers) do
         { "HTTP_ACCEPT" => "application/json" }
       end
 
-      it "s" do
+      it "json" do
         get uri, nil, headers
 
         expect(last_response.status).to eq(200)
 
         response = JSON.parse(last_response.body)
         attributes = response.dig("data", 0, "attributes")
-        expect(attributes["subj-id"]).to eq(event.subj_id)
+        expect(attributes["obj-id"]).to eq(event.obj_id)
+      end
+    end
+
+    context "query by obj-id as doi" do
+      let(:doi) { "10.1371/journal.pmed.0030186" }
+      let(:event) { create(:event, obj_id: doi) }
+      let(:uri) { "/events?obj-id=#{doi}" }
+
+      # Exclude the token header.
+      let(:headers) do
+        { "HTTP_ACCEPT" => "application/json" }
+      end
+
+      it "json" do
+        get uri, nil, headers
+
+        expect(last_response.status).to eq(200)
+
+        response = JSON.parse(last_response.body)
+        attributes = response.dig("data", 0, "attributes")
+        expect(attributes["obj-id"]).to eq(event.obj_id)
+      end
+    end
+
+    context "query by doi as doi" do
+      let(:doi) { "10.1371/journal.pmed.0030186" }
+      let(:event) { create(:event, obj_id: doi) }
+      let(:uri) { "/events?doi=#{doi}" }
+
+      # Exclude the token header.
+      let(:headers) do
+        { "HTTP_ACCEPT" => "application/json" }
+      end
+
+      it "json" do
+        get uri, nil, headers
+
+        expect(last_response.status).to eq(200)
+
+        response = JSON.parse(last_response.body)
+        attributes = response.dig("data", 0, "attributes")
+        expect(attributes["obj-id"]).to eq(event.obj_id)
       end
     end
 
@@ -308,7 +350,7 @@ describe "/events", :type => :request do
         { "HTTP_ACCEPT" => "application/json" }
       end
 
-      it "s" do
+      it "json" do
         get uri, nil, headers
 
         expect(last_response.status).to eq(200)
