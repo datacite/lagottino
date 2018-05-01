@@ -3,7 +3,7 @@ class EventsController < ApplicationController
   include Identifiable
 
   prepend_before_action :authenticate_user_from_token!, :except => [:index, :show]
-  before_action :load_event, only: [:show, :destroy]
+  before_action :load_event, only: [:show, :destroy, :update]
   load_and_authorize_resource :except => [:create, :show, :index]
   load_resource :except => [:create, :index]
 
@@ -18,11 +18,20 @@ class EventsController < ApplicationController
       render json: { errors: errors }, status: :unprocessable_entity
     end
   rescue ActiveRecord::RecordNotUnique
-    render json: @event, :status => :created
+    render jsonapi: @event, :status => :created
+  end
+
+  def update
+    if @event.update_attributes(safe_params)
+      render jsonapi: @event
+    else
+      Rails.logger.warn @event.errors.inspect
+      render json: serialize(@event.errors), status: :unprocessable_entity
+    end
   end
 
   def show
-    render json: @event
+    render jsonapi: @event
   end
 
   def index
@@ -50,7 +59,7 @@ class EventsController < ApplicationController
     @events = collection.order(order).page(page[:number]).per(page[:size])
 
     meta = { total: total, 'total-pages' => total_pages, page: page[:number].to_i }
-    render json: @events, meta: meta
+    render jsonapi: @events, meta: meta
   end
 
   def destroy
@@ -58,7 +67,7 @@ class EventsController < ApplicationController
       render json: { data: {} }, status: :ok
     else
       errors = @event.errors.full_messages.map { |message| { status: 422, title: message } }
-      render json: { errors: errors }, status: :unprocessable_entity
+      render jsonapi: { errors: errors }, status: :unprocessable_entity
     end
   end
 
