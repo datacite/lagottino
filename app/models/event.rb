@@ -8,8 +8,10 @@ class Event < ActiveRecord::Base
   # include doi normalization
   include Identifiable
 
-  before_create :create_uuid
   before_validation :set_defaults
+
+  validates :uuid, format: { with: /\A[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/i }
+
   # after_commit :queue_event_job, :on => :create
 
   # include state machine
@@ -82,11 +84,8 @@ class Event < ActiveRecord::Base
     "events/#{uuid}-#{timestamp}"
   end
 
-  def create_uuid
-    write_attribute(:uuid, SecureRandom.uuid) if uuid.blank?
-  end
-
   def set_defaults
+    self.uuid = SecureRandom.uuid if uuid.blank?
     self.subj_id = normalize_doi(subj_id) || subj_id
     self.obj_id = normalize_doi(obj_id) || obj_id
     self.subj = {} if subj.blank?
