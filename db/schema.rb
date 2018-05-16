@@ -12,7 +12,7 @@
 
 ActiveRecord::Schema.define(version: 2018_05_02_095415) do
 
-  create_table "events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "events", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.text "uuid", null: false
     t.string "subj_id", limit: 191, null: false
     t.string "obj_id", limit: 191
@@ -37,7 +37,7 @@ ActiveRecord::Schema.define(version: 2018_05_02_095415) do
     t.index ["updated_at"], name: "index_events_on_updated_at"
   end
 
-  create_table "sources", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "sources", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name", limit: 191
     t.string "title", null: false
     t.string "group_id", limit: 191

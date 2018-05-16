@@ -197,6 +197,166 @@ describe "/events", :type => :request do
     end
   end
 
+  context "upsert" do
+    let(:uri) { "/events/#{event.uuid}" }
+    let(:params) do
+      { "data" => { "type" => "events",
+                    "id" => event.uuid,
+                    "attributes" => {
+                      "uuid" => event.uuid,
+                      "subj-id" => event.subj_id,
+                      "subj" => event.subj,
+                      "obj-id" => event.obj_id,
+                      "relation-type-id" => event.relation_type_id,
+                      "source-id" => event.source_id,
+                      "source-token" => event.source_token } } }
+    end
+
+    context "as admin user" do
+      it "JSON" do
+        put uri, params, headers
+
+        expect(last_response.status).to eq(201)
+
+        response = JSON.parse(last_response.body)
+        expect(response["errors"]).to be_nil
+        expect(response.dig("data", "attributes", "subj-id")).to eq("http://www.citeulike.org/user/dbogartoit")
+      end
+    end
+
+    context "as staff user" do
+      let(:token) { User.generate_token(role_id: "staff_user") }
+
+      it "JSON" do
+        put uri, params, headers
+        expect(last_response.status).to eq(401)
+
+        response = JSON.parse(last_response.body)
+        expect(response["errors"]).to eq(errors)
+        expect(response["data"]).to be_nil
+      end
+    end
+
+    context "as regular user" do
+      let(:token) { User.generate_token(role_id: "user") }
+
+      it "JSON" do
+        put uri, params, headers
+        expect(last_response.status).to eq(401)
+
+        response = JSON.parse(last_response.body)
+        expect(response["errors"]).to eq(errors)
+        expect(response["data"]).to be_blank
+      end
+    end
+
+    context "without source-token" do
+      let(:params) do
+        { "data" => { "type" => "events",
+            
+                      "attributes" => {
+                        "uuid" => uuid,
+                        "subj-id" => event.subj_id,
+                        "source-id" => event.source_id } } }
+      end
+
+      it "JSON" do
+        put uri, params, headers
+        expect(last_response.status).to eq(422)
+
+        response = JSON.parse(last_response.body)
+        expect(response["errors"]).to eq([{"status"=>422, "title"=>"Source token can't be blank"}])
+        expect(response["data"]).to be_nil
+      end
+    end
+
+    context "without source-id" do
+      let(:params) do
+        { "data" => { "type" => "events",
+                      "attributes" => {
+                        "uuid" => uuid,
+                        "subj-id" => event.subj_id,
+                        "source-token" => event.source_token } } }
+      end
+
+      it "JSON" do
+        put uri, params, headers
+        expect(last_response.status).to eq(422)
+
+        response = JSON.parse(last_response.body)
+        expect(response["errors"]).to eq([{"status"=>422, "title"=>"Source can't be blank"}])
+        expect(response["data"]).to be_blank
+      end
+    end
+
+    context "without subj-id" do
+      let(:params) do
+        { "data" => { "type" => "events",
+                      "attributes" => {
+                        "uuid" => uuid,
+                        "source-id" => event.source_id,
+                        "source-token" => event.source_token } } }
+      end
+
+      it "JSON" do
+        put uri, params, headers
+        expect(last_response.status).to eq(422)
+
+        response = JSON.parse(last_response.body)
+        expect(response["errors"]).to eq([{"status"=>422, "title"=>"Subj can't be blank"}])
+        expect(response["data"]).to be_blank
+      end
+    end
+
+    context "with wrong API token" do
+      let(:headers) do
+        { "HTTP_ACCEPT" => "application/json",
+          "HTTP_AUTHORIZATION" => "Bearer 12345678" }
+      end
+
+      it "JSON" do
+        put uri, params, headers
+        expect(last_response.status).to eq(401)
+
+        response = JSON.parse(last_response.body)
+        expect(response["errors"]).to eq(errors)
+        expect(response["data"]).to be_blank
+      end
+    end
+
+    context "with missing data param" do
+      let(:params) do
+        { "event" => { "type" => "events",
+                         "attributes" => {
+                           "uuid" => uuid,
+                           "source-token" => "123" } } }
+      end
+
+      it "JSON" do
+        put uri, params, headers
+        expect(last_response.status).to eq(422)
+
+        response = JSON.parse(last_response.body)
+        expect(response.dig("errors", 0, "title")).to start_with("Invalid payload")
+        expect(response["data"]).to be_blank
+      end
+    end
+
+    context "with params in wrong format" do
+      let(:params) { { "data" => "10.1371/journal.pone.0036790 2012-05-15 New Dromaeosaurids (Dinosauria: Theropoda) from the Lower Cretaceous of Utah, and the Evolution of the Dromaeosaurid Tail" } }
+
+      it "JSON" do
+        put uri, params, headers
+        expect(last_response.status).to eq(422)
+        response = JSON.parse(last_response.body)
+        error = response["errors"].first
+        expect(error["status"]).to eq("422")
+        expect(error["title"]).to start_with("Invalid payload")
+        expect(response["data"]).to be_blank
+      end
+    end
+  end
+
   context "update" do
     let(:event) { create(:event) }
     let(:uri) { "/events/#{event.uuid}" }

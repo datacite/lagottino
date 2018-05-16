@@ -3,9 +3,8 @@ class EventsController < ApplicationController
   include Identifiable
 
   prepend_before_action :authenticate_user_from_token!, :except => [:index, :show]
-  before_action :load_event, only: [:show, :destroy, :update]
-  load_and_authorize_resource :except => [:create, :show, :index]
-  load_resource :except => [:create, :index]
+  before_action :load_event, only: [:show, :destroy]
+  authorize_resource only: [:destroy]
 
   def create
     @event = Event.new(safe_params.except(:format))
@@ -22,11 +21,19 @@ class EventsController < ApplicationController
   end
 
   def update
+    @event = Event.where(uuid: params[:id]).first
+    exists = @event.present?
+
+    # create event if it doesn't exist already
+    @event = Event.new(safe_params.except(:format)) unless @event.present?
+
+    authorize! :update, @event
+
     if @event.update_attributes(safe_params)
-      render jsonapi: @event
+      render jsonapi: @event, status: exists ? :ok : :created
     else
-      Rails.logger.warn @event.errors.inspect
-      render json: serialize(@event.errors), status: :unprocessable_entity
+      errors = @event.errors.full_messages.map { |message| { status: 422, title: message } }
+      render json: { errors: errors }, status: :unprocessable_entity
     end
   end
 
