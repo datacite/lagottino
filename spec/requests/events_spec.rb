@@ -44,7 +44,6 @@ describe "/events", :type => :request do
     let(:params) do
       { "data" => { "type" => "events",
                     "attributes" => {
-                      "uuid" => event.uuid,
                       "subj-id" => event.subj_id,
                       "subj" => event.subj,
                       "obj-id" => event.obj_id,
@@ -61,6 +60,7 @@ describe "/events", :type => :request do
 
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to be_nil
+        expect(response.dig("data", "id")).not_to eq(event.uuid)
         expect(response.dig("data", "attributes", "subj-id")).to eq("http://www.citeulike.org/user/dbogartoit")
       end
     end
@@ -236,6 +236,7 @@ describe "/events", :type => :request do
 
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to be_nil
+        expect(response.dig("data", "id")).to eq(event.uuid)
         expect(response.dig("data", "attributes", "subj-id")).to eq("http://www.citeulike.org/user/dbogartoit")
       end
     end
