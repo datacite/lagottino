@@ -16,8 +16,6 @@ class EventsController < ApplicationController
       errors = @event.errors.full_messages.map { |message| { status: 422, title: message } }
       render json: { errors: errors }, status: :unprocessable_entity
     end
-  rescue ActiveRecord::RecordNotUnique
-    render jsonapi: @event, :status => :created
   end
 
   def update

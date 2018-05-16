@@ -195,6 +195,22 @@ describe "/events", :type => :request do
         expect(response["data"]).to be_blank
       end
     end
+
+    context "duplicate entry" do
+      let!(:event) { create(:event) }
+
+      it "JSON" do
+        post uri, params, headers
+
+        expect(last_response.status).to eq(409)
+
+        response = JSON.parse(last_response.body)
+        error = response["errors"].first
+        expect(error["status"]).to eq("409")
+        expect(error["title"]).to eq("The resource already exists.")
+        expect(response["data"]).to be_blank
+      end
+    end
   end
 
   context "upsert" do
@@ -353,6 +369,20 @@ describe "/events", :type => :request do
         expect(error["status"]).to eq("422")
         expect(error["title"]).to start_with("Invalid payload")
         expect(response["data"]).to be_blank
+      end
+    end
+
+    context "entry already exists" do
+      let!(:event) { create(:event) }
+
+      it "JSON" do
+        put uri, params, headers
+
+        expect(last_response.status).to eq(200)
+
+        response = JSON.parse(last_response.body)
+        expect(response["errors"]).to be_nil
+        expect(response.dig("data", "attributes", "subj-id")).to eq("http://www.citeulike.org/user/dbogartoit")
       end
     end
   end

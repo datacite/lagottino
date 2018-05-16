@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_05_02_095415) do
+ActiveRecord::Schema.define(version: 2018_05_16_054039) do
 
-  create_table "events", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.text "uuid", null: false
     t.string "subj_id", limit: 191, null: false
     t.string "obj_id", limit: 191
@@ -33,20 +33,8 @@ ActiveRecord::Schema.define(version: 2018_05_02_095415) do
     t.integer "total", default: 1
     t.string "license", limit: 191
     t.index ["source_id", "created_at"], name: "index_events_on_source_id_created_at"
-    t.index ["subj_id"], name: "index_events_on_subj_id"
+    t.index ["subj_id", "obj_id", "source_id", "relation_type_id"], name: "index_events_on_multiple_columns", unique: true
     t.index ["updated_at"], name: "index_events_on_updated_at"
-  end
-
-  create_table "sources", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
-    t.string "name", limit: 191
-    t.string "title", null: false
-    t.string "group_id", limit: 191
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.text "description"
-    t.boolean "private", default: false
-    t.boolean "cumulative", default: false
-    t.index ["name"], name: "index_sources_on_name", unique: true
   end
 
 end

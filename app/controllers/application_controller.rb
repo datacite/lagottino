@@ -64,6 +64,7 @@ class ApplicationController < ActionController::API
                when "CanCan::AccessDenied", "JWT::DecodeError" then 401
                when "ActiveRecord::RecordNotFound", "AbstractController::ActionNotFound", "ActionController::RoutingError" then 404
                when "ActionController::UnknownFormat" then 406
+               when "ActiveRecord::RecordNotUnique" then 409
                when "ActiveModel::ForbiddenAttributesError", "ActionController::ParameterMissing", "ActionController::UnpermittedParameters", "ActiveModelSerializers::Adapter::JsonApi::Deserialization::InvalidDocument" then 422
                else 400
                end
@@ -74,6 +75,8 @@ class ApplicationController < ActionController::API
         message = "You are not authorized to access this resource."
       elsif status == 406
         message = "The content type is not recognized."
+      elsif status == 409
+        message = "The resource already exists."
       else
         Bugsnag.notify(exception)
 
