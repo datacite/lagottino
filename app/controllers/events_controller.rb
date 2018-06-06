@@ -46,6 +46,7 @@ class EventsController < ApplicationController
     collection = Event
     collection = collection.where(source_id: params[:source_id]) if params[:source_id].present?
     collection = collection.where(obj_id: normalize_doi(params[:obj_id])) if params[:obj_id].present?
+    collection = collection.where(subj_id: params[:subj_id]) if params[:subj_id].present?
 
     page = params[:page] || {}
     page[:number] = page[:number] && page[:number].to_i > 0 ? page[:number].to_i : 1

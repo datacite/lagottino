@@ -594,6 +594,45 @@ describe "/events", :type => :request do
       end
     end
 
+    context "query by subj-id" do
+      let(:uri) { "/events?subj-id=#{event.subj_id}" }
+
+      # Exclude the token header.
+      let(:headers) do
+        { "HTTP_ACCEPT" => "application/json" }
+      end
+
+      it "json" do
+        get uri, nil, headers
+
+        expect(last_response.status).to eq(200)
+
+        response = JSON.parse(last_response.body)
+        attributes = response.dig("data", 0, "attributes")
+        expect(attributes["subj-id"]).to eq(event.subj_id)
+      end
+    end
+
+    context "query by unknown subj-id" do
+      let(:uri) { "/events?subj-id=xxx" }
+
+      # Exclude the token header.
+      let(:headers) do
+        { "HTTP_ACCEPT" => "application/json" }
+      end
+
+      it "json" do
+        get uri, nil, headers
+
+        expect(last_response.status).to eq(200)
+
+        response = JSON.parse(last_response.body)
+
+        expect(response["errors"]).to be_nil
+        expect(response["data"]).to be_empty
+      end
+    end
+
     context "query by obj-id as doi" do
       let(:doi) { "10.1371/journal.pmed.0030186" }
       let(:event) { create(:event, obj_id: doi) }
