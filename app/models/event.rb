@@ -71,6 +71,8 @@ class Event < ActiveRecord::Base
     indexes :uuid,             type: :keyword
     indexes :subj_id,          type: :keyword
     indexes :obj_id,           type: :keyword
+    indexes :subj,             type: :text
+    indexes :obj,              type: :text
     indexes :source_id,        type: :keyword
     indexes :source_token,     type: :keyword
     indexes :message_action,   type: :keyword
@@ -81,10 +83,10 @@ class Event < ActiveRecord::Base
     indexes :callback,         type: :text
     indexes :aasm_state,       type: :keyword
     indexes :state_event,      type: :keyword
-    indexes :created_at,    type: :date
-    indexes :updated_at,    type: :date
-    indexes :indexed_at,    type: :date
-    indexes :occurred_at,   type: :date
+    indexes :created_at,       type: :date
+    indexes :updated_at,       type: :date
+    indexes :indexed_at,       type: :date
+    indexes :occurred_at,      type: :date
   end
 
   def as_indexed_json(options={})
@@ -114,8 +116,8 @@ class Event < ActiveRecord::Base
 
   def self.query_aggregations
     {
-      years: { date_histogram: { field: 'occurred-at', interval: 'year', min_doc_count: 1 } },
-      months: { date_histogram: { field: 'occurred-at', interval: 'year', min_doc_count: 1 } }
+      years: { date_histogram: { field: 'occurred_at', interval: 'year', min_doc_count: 1 } },
+      months: { date_histogram: { field: 'occurred_at', interval: 'year', min_doc_count: 1 } }
     }
   end
 

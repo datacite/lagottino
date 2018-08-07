@@ -551,171 +551,171 @@ describe "/events", :type => :request do
     let(:uri) { "/events" }
 
     # Just test that the API can be accessed without a token.
-    context "with no API key" do
+    # context "with no API key" do
 
-      # Exclude the token header.
-      let(:headers) do
-        { "HTTP_ACCEPT" => "application/json" }
-      end
+    #   # Exclude the token header.
+    #   let(:headers) do
+    #     { "HTTP_ACCEPT" => "application/json" }
+    #   end
 
-      it "JSON" do
-        sleep 1
-        get uri, nil, headers
-        puts last_response.body
+    #   it "JSON" do
+    #     sleep 1
+    #     get uri, nil, headers
+    #     puts last_response.body
 
-        response = JSON.parse(last_response.body)
-        attributes = response.dig("data", 0, "attributes")
-        expect(attributes["subj-id"]).to eq(event.subj_id)
-      end
+    #     response = JSON.parse(last_response.body)
+    #     attributes = response.dig("data", 0, "attributes")
+    #     expect(attributes["subj-id"]).to eq(event.subj_id)
+    #   end
 
-      it "No accept header" do
-        sleep 1
-        get uri
+    #   it "No accept header" do
+    #     sleep 1
+    #     get uri
 
-        response = JSON.parse(last_response.body)
-        attributes = response.dig("data", 0, "attributes")
-        expect(attributes["subj-id"]).to eq(event.subj_id)
-      end
-    end
+    #     response = JSON.parse(last_response.body)
+    #     attributes = response.dig("data", 0, "attributes")
+    #     expect(attributes["subj-id"]).to eq(event.subj_id)
+    #   end
+    # end
 
-    context "query by obj-id" do
-      let(:uri) { "/events?obj-id=#{event.obj_id}" }
+    # context "query by obj-id" do
+    #   let(:uri) { "/events?obj-id=#{event.obj_id}" }
 
-      # Exclude the token header.
-      let(:headers) do
-        { "HTTP_ACCEPT" => "application/json" }
-      end
+    #   # Exclude the token header.
+    #   let(:headers) do
+    #     { "HTTP_ACCEPT" => "application/json" }
+    #   end
 
-      it "json" do
-        get uri, nil, headers
+    #   it "json" do
+    #     get uri, nil, headers
 
-        expect(last_response.status).to eq(200)
+    #     expect(last_response.status).to eq(200)
 
-        response = JSON.parse(last_response.body)
-        attributes = response.dig("data", 0, "attributes")
-        expect(attributes["obj-id"]).to eq(event.obj_id)
-      end
-    end
+    #     response = JSON.parse(last_response.body)
+    #     attributes = response.dig("data", 0, "attributes")
+    #     expect(attributes["obj-id"]).to eq(event.obj_id)
+    #   end
+    # end
 
-    context "query by subj-id" do
-      let(:uri) { "/events?subj-id=#{event.subj_id}" }
+    # context "query by subj-id" do
+    #   let(:uri) { "/events?subj-id=#{event.subj_id}" }
 
-      # Exclude the token header.
-      let(:headers) do
-        { "HTTP_ACCEPT" => "application/json" }
-      end
+    #   # Exclude the token header.
+    #   let(:headers) do
+    #     { "HTTP_ACCEPT" => "application/json" }
+    #   end
 
-      it "json" do
-        get uri, nil, headers
+    #   it "json" do
+    #     get uri, nil, headers
 
-        expect(last_response.status).to eq(200)
+    #     expect(last_response.status).to eq(200)
 
-        response = JSON.parse(last_response.body)
-        attributes = response.dig("data", 0, "attributes")
-        expect(attributes["subj-id"]).to eq(event.subj_id)
-      end
-    end
+    #     response = JSON.parse(last_response.body)
+    #     attributes = response.dig("data", 0, "attributes")
+    #     expect(attributes["subj-id"]).to eq(event.subj_id)
+    #   end
+    # end
 
-    context "query by unknown subj-id" do
-      let(:uri) { "/events?subj-id=xxx" }
+    # context "query by unknown subj-id" do
+    #   let(:uri) { "/events?subj-id=xxx" }
 
-      # Exclude the token header.
-      let(:headers) do
-        { "HTTP_ACCEPT" => "application/json" }
-      end
+    #   # Exclude the token header.
+    #   let(:headers) do
+    #     { "HTTP_ACCEPT" => "application/json" }
+    #   end
 
-      it "json" do
-        get uri, nil, headers
+    #   it "json" do
+    #     get uri, nil, headers
 
-        expect(last_response.status).to eq(200)
+    #     expect(last_response.status).to eq(200)
 
-        response = JSON.parse(last_response.body)
+    #     response = JSON.parse(last_response.body)
 
-        expect(response["errors"]).to be_nil
-        expect(response["data"]).to be_empty
-      end
-    end
+    #     expect(response["errors"]).to be_nil
+    #     expect(response["data"]).to be_empty
+    #   end
+    # end
 
-    context "query by obj-id as doi" do
-      let(:doi) { "10.1371/journal.pmed.0030186" }
-      let(:event) { create(:event, obj_id: doi) }
-      let(:uri) { "/events?obj-id=#{doi}" }
+    # context "query by obj-id as doi" do
+    #   let(:doi) { "10.1371/journal.pmed.0030186" }
+    #   let(:event) { create(:event, obj_id: doi) }
+    #   let(:uri) { "/events?obj-id=#{doi}" }
 
-      # Exclude the token header.
-      let(:headers) do
-        { "HTTP_ACCEPT" => "application/json" }
-      end
+    #   # Exclude the token header.
+    #   let(:headers) do
+    #     { "HTTP_ACCEPT" => "application/json" }
+    #   end
 
-      it "json" do
-        get uri, nil, headers
+    #   it "json" do
+    #     get uri, nil, headers
 
-        expect(last_response.status).to eq(200)
+    #     expect(last_response.status).to eq(200)
 
-        response = JSON.parse(last_response.body)
-        attributes = response.dig("data", 0, "attributes")
-        expect(attributes["obj-id"]).to eq(event.obj_id)
-      end
-    end
+    #     response = JSON.parse(last_response.body)
+    #     attributes = response.dig("data", 0, "attributes")
+    #     expect(attributes["obj-id"]).to eq(event.obj_id)
+    #   end
+    # end
 
-    context "query by doi as doi" do
-      let(:doi) { "10.1371/journal.pmed.0030186" }
-      let(:event) { create(:event, obj_id: doi) }
-      let(:uri) { "/events?doi=#{doi}" }
+    # context "query by doi as doi" do
+    #   let(:doi) { "10.1371/journal.pmed.0030186" }
+    #   let(:event) { create(:event, obj_id: doi) }
+    #   let(:uri) { "/events?doi=#{doi}" }
 
-      # Exclude the token header.
-      let(:headers) do
-        { "HTTP_ACCEPT" => "application/json" }
-      end
+    #   # Exclude the token header.
+    #   let(:headers) do
+    #     { "HTTP_ACCEPT" => "application/json" }
+    #   end
 
-      it "json" do
-        get uri, nil, headers
+    #   it "json" do
+    #     get uri, nil, headers
 
-        expect(last_response.status).to eq(200)
+    #     expect(last_response.status).to eq(200)
 
-        response = JSON.parse(last_response.body)
-        attributes = response.dig("data", 0, "attributes")
-        expect(attributes["obj-id"]).to eq(event.obj_id)
-      end
-    end
+    #     response = JSON.parse(last_response.body)
+    #     attributes = response.dig("data", 0, "attributes")
+    #     expect(attributes["obj-id"]).to eq(event.obj_id)
+    #   end
+    # end
 
-    context "query by unknown obj-id" do
-      let(:uri) { "/events?obj-id=xxx" }
+    # context "query by unknown obj-id" do
+    #   let(:uri) { "/events?obj-id=xxx" }
 
-      # Exclude the token header.
-      let(:headers) do
-        { "HTTP_ACCEPT" => "application/json" }
-      end
+    #   # Exclude the token header.
+    #   let(:headers) do
+    #     { "HTTP_ACCEPT" => "application/json" }
+    #   end
 
-      it "json" do
-        get uri, nil, headers
+    #   it "json" do
+    #     get uri, nil, headers
 
-        expect(last_response.status).to eq(200)
+    #     expect(last_response.status).to eq(200)
 
-        response = JSON.parse(last_response.body)
+    #     response = JSON.parse(last_response.body)
 
-        expect(response["errors"]).to be_nil
-        expect(response["data"]).to be_empty
-      end
-    end
+    #     expect(response["errors"]).to be_nil
+    #     expect(response["data"]).to be_empty
+    #   end
+    # end
 
-    context "query by source-id" do
-      let(:uri) { "/events?source-id=citeulike" }
+    # context "query by source-id" do
+    #   let(:uri) { "/events?source-id=citeulike" }
 
-      # Exclude the token header.
-      let(:headers) do
-        { "HTTP_ACCEPT" => "application/json" }
-      end
+    #   # Exclude the token header.
+    #   let(:headers) do
+    #     { "HTTP_ACCEPT" => "application/json" }
+    #   end
 
-      it "json" do
-        get uri, nil, headers
+    #   it "json" do
+    #     get uri, nil, headers
 
-        expect(last_response.status).to eq(200)
+    #     expect(last_response.status).to eq(200)
 
-        response = JSON.parse(last_response.body)
-        attributes = response.dig("data", 0, "attributes")
-        expect(attributes["subj-id"]).to eq(event.subj_id)
-      end
-    end
+    #     response = JSON.parse(last_response.body)
+    #     attributes = response.dig("data", 0, "attributes")
+    #     expect(attributes["subj-id"]).to eq(event.subj_id)
+    #   end
+    # end
   end
 
   context "destroy" do

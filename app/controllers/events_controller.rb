@@ -51,7 +51,7 @@ class EventsController < ApplicationController
            when "-total" then { "total" => { order: 'desc' }}
            when "created" then { created_at: { order: 'asc' }}
            when "-created" then { created_at: { order: 'desc' }}
-           else { "obj_id" => { "order": "asc" }}
+           else { "obj_id" => { order: "asc" }}
            end
 
     if params[:id].present?

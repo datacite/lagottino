@@ -24,7 +24,7 @@ module Indexable
       __elasticsearch__.search({
         query: {
           term: {
-            symbol: id.upcase
+            obj_id: id.upcase
           }
         },
         aggregations: query_aggregations
@@ -56,7 +56,7 @@ module Indexable
         sort: [options[:sort]],
         query: {
           terms: {
-            symbol: ids.split(",").map(&:upcase)
+            obj_id: ids.split(",").map(&:upcase)
           }
         },
         aggregations: query_aggregations
