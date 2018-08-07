@@ -8,6 +8,11 @@ class Event < ActiveRecord::Base
   # include doi normalization
   include Identifiable
 
+  # include helper module for Elasticsearch
+  include Indexable
+  
+  include Elasticsearch::Model
+
   before_validation :set_defaults
 
   validates :uuid, format: { with: /\A[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/i }
@@ -58,6 +63,61 @@ class Event < ActiveRecord::Base
 
   scope :by_state, ->(state) { where("aasm_state = ?", state) }
   scope :order_by_date, -> { order("updated_at DESC") }
+
+  # use different index for testing
+  index_name Rails.env.test? ? "events-test" : "events"
+
+  mapping dynamic: 'false' do
+    indexes :uuid,             type: :keyword
+    indexes :subj_id,          type: :keyword
+    indexes :obj_id,           type: :keyword
+    indexes :source_id,        type: :keyword
+    indexes :source_token,     type: :keyword
+    indexes :message_action,   type: :keyword
+    indexes :relation_type_id, type: :keyword
+    indexes :total,            type: :integer
+    indexes :license,          type: :text, fields: { keyword: { type: "keyword" }}
+    indexes :error_messages,   type: :text
+    indexes :callback,         type: :text
+    indexes :aasm_state,       type: :keyword
+    indexes :state_event,      type: :keyword
+    indexes :created_at,    type: :date
+    indexes :updated_at,    type: :date
+    indexes :indexed_at,    type: :date
+    indexes :occurred_at,   type: :date
+  end
+
+  def as_indexed_json(options={})
+    {
+      "uuid" => uuid,
+      "subj_id" => subj_id,
+      "obj_id" => obj_id,
+      "source_id" => source_id,
+      "source_token" => source_token,
+      "message_action" => message_action,
+      "relation_type_id" => relation_type_id,
+      "total" => total,
+      "license" => license,
+      "error_messages" => error_messages,
+      "aasm_state" => aasm_state,
+      "state_event" => state_event,
+      "created_at" => created_at,
+      "updated_at" => updated_at,
+      "indexed_at" => indexed_at,
+      "occurred_at" => occurred_at
+    }
+  end
+
+  def self.query_fields
+    ['subj_id^10', 'obj_id^10', '_all']
+  end
+
+  def self.query_aggregations
+    {
+      years: { date_histogram: { field: 'occurred-at', interval: 'year', min_doc_count: 1 } },
+      months: { date_histogram: { field: 'occurred-at', interval: 'year', min_doc_count: 1 } }
+    }
+  end
 
   def to_param  # overridden, use uuid instead of id
     uuid

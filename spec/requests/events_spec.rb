@@ -559,7 +559,9 @@ describe "/events", :type => :request do
       end
 
       it "JSON" do
+        sleep 1
         get uri, nil, headers
+        puts last_response.body
 
         response = JSON.parse(last_response.body)
         attributes = response.dig("data", 0, "attributes")
@@ -567,6 +569,7 @@ describe "/events", :type => :request do
       end
 
       it "No accept header" do
+        sleep 1
         get uri
 
         response = JSON.parse(last_response.body)

@@ -40,31 +40,43 @@ class EventsController < ApplicationController
   end
 
   def index
-    # support doi as alias for obj_id
-    params[:obj_id] ||= params[:doi]
+    page = (params.dig(:page, :number) || 1).to_i
+    size = (params.dig(:page, :size) || 25).to_i
+    from = (page - 1) * size
 
-    collection = Event
-    collection = collection.where(source_id: params[:source_id]) if params[:source_id].present?
-    collection = collection.where(obj_id: normalize_doi(params[:obj_id])) if params[:obj_id].present?
+    sort = case params[:sort]
+           when "relevance" then { "_score" => { order: 'desc' }}
+           when "-obj_id" then { "obj_id" => { order: 'desc' }}
+           when "total" then { "total" => { order: 'asc' }}
+           when "-total" then { "total" => { order: 'desc' }}
+           when "created" then { created_at: { order: 'asc' }}
+           when "-created" then { created_at: { order: 'desc' }}
+           else { "obj_id" => { "order": "asc" }}
+           end
 
-    page = params[:page] || {}
-    page[:number] = page[:number] && page[:number].to_i > 0 ? page[:number].to_i : 1
-    page[:size] = page[:size] && (1..1000).include?(page[:size].to_i) ? page[:size].to_i : 25
-    
-    total = get_total_entries(params)
-    total_pages = (total / page[:size]).ceil
+    if params[:id].present?
+      response = Event.find_by_id(params[:id]) 
+    elsif params[:ids].present?
+      response = Event.find_by_ids(params[:ids], from: from, size: size, sort: sort)
+    else
+      response = Event.query(params[:query], source_id: params[:source_id], obj_id: params[:obj_id], from: from, size: size, sort: sort)
+    end
 
-    order = case params[:sort]
-            when "created" then "events.created_at"
-            when "name" then "events.uuid"
-            when "-name" then "events.uuid DESC"
-            else "events.created_at DESC"
-            end
+    total = response.results.total
+    total_pages = (total.to_f / size).ceil
+    years = total > 0 ? facet_by_year(response.response.aggregations.years.buckets) : nil
+    #providers = total > 0 ? facet_by_provider(response.response.aggregations.providers.buckets) : nil
 
-    @events = collection.order(order).page(page[:number]).per(page[:size])
+    @events = response.page(page).per(size).records
 
-    meta = { total: total, 'total-pages' => total_pages, page: page[:number].to_i }
-    render jsonapi: @events, meta: meta
+    meta = {
+      total: total,
+      total_pages: total_pages,
+      page: page,
+      years: years,
+    }.compact
+
+    render jsonapi: @events, meta: meta, include: @include
   end
 
   def destroy

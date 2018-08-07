@@ -7,7 +7,7 @@ RSpec.describe EventJob, :type => :job do
 
   it "enqueue jobs" do
     expect(event.waiting?).to be true
-    expect(enqueued_jobs.size).to eq(0)
+    expect(enqueued_jobs.size).to eq(1)
 
     # event_job = enqueued_jobs.first
     # expect(event_job[:job]).to eq(EventJob)

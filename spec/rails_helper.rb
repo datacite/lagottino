@@ -58,7 +58,7 @@ VCR.configure do |c|
   c.cassette_library_dir = "spec/fixtures/vcr_cassettes"
   c.hook_into :webmock
   c.ignore_localhost = true
-  c.ignore_hosts "codeclimate.com", "api.mailgun.net", sqs_host
+  c.ignore_hosts "codeclimate.com", "api.mailgun.net", "elasticsearch", sqs_host
   c.filter_sensitive_data("<MAILGUN_TOKEN>") { mailgun_token }
   c.filter_sensitive_data("<SLACK_WEBHOOK_URL>") { ENV["SLACK_WEBHOOK_URL"] }
   c.configure_rspec_metadata!
