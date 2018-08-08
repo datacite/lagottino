@@ -2,6 +2,8 @@ class EventsController < ApplicationController
 
   include Identifiable
 
+  include Facetable
+
   prepend_before_action :authenticate_user_from_token!, :except => [:index, :show]
   before_action :load_event, only: [:show, :destroy]
   authorize_resource only: [:destroy]
