@@ -68,11 +68,16 @@ module Indexable
 
       must = []
       must << { multi_match: { query: query, fields: query_fields, type: "phrase_prefix", max_expansions: 50 }} if query.present?
-      must << { term: { aasm_state: options[:state] }} if options[:state].present?
-      must << { term: { obj_id: options[:obj_id] }} if options[:obj_id].present?
       must << { term: { subj_id: options[:subj_id] }} if options[:subj_id].present?
+      must << { term: { obj_id: options[:obj_id] }} if options[:obj_id].present?
+      must << { term: { doi: options[:doi] }} if options[:doi].present?
+      must << { term: { year_month: options[:year_month] }} if options[:year_month].present?
       must << { range: { occurred_at: { gte: "#{options[:occurred_at].split(",").min}||/y", lte: "#{options[:occurred_at].split(",").max}||/y", format: "yyyy" }}} if options[:occurred_at].present?
+      must << { term: { prefix: options[:prefix] }} if options[:prefix].present?
       must << { term: { source_id: options[:source_id] }} if options[:source_id].present?
+      must << { term: { relation_type_id: options[:relation_type_id] }} if options[:relation_type_id].present?
+      must << { term: { metric_type: options[:metric_type] }} if options[:metric_type].present?
+      must << { term: { access_method: options[:access_method] }} if options[:access_method].present?
 
       must_not = []
 

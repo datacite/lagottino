@@ -61,13 +61,29 @@ class EventsController < ApplicationController
     elsif params[:ids].present?
       response = Event.find_by_ids(params[:ids], from: from, size: size, sort: sort)
     else
-      response = Event.query(params[:query], source_id: params[:source_id], obj_id: params[:obj_id], from: from, size: size, sort: sort)
+      response = Event.query(params[:query],
+                             subj_id: params[:subj_id],
+                             obj_id: params[:obj_id],
+                             doi: params[:doi],
+                             prefix: params[:prefix],
+                             source_id: params[:source_id], 
+                             relation_type_id: params[:relation_type_id],
+                             metric_type: params[:metric_type],
+                             access_method: params[:access_method],
+                             year_month: params[:year_month], 
+                             from: from, 
+                             size: size, 
+                             sort: sort)
     end
 
     total = response.results.total
     total_pages = (total.to_f / size).ceil
-    years = total > 0 ? facet_by_year(response.response.aggregations.years.buckets) : nil
-    #providers = total > 0 ? facet_by_provider(response.response.aggregations.providers.buckets) : nil
+    year_months = total > 0 ? facet_by_year_month(response.response.aggregations.year_months.buckets) : nil
+    sources = total > 0 ? facet_by_source(response.response.aggregations.sources.buckets) : nil
+    prefixes = total > 0 ? facet_by_source(response.response.aggregations.prefixes.buckets) : nil
+    relation_types = total > 0 ? facet_by_key(response.response.aggregations.relation_types.buckets) : nil
+    metric_types = total > 0 ? facet_by_metric_type(response.response.aggregations.metric_types.buckets) : nil
+    access_methods = total > 0 ? facet_by_key(response.response.aggregations.access_methods.buckets) : nil
 
     @events = response.page(page).per(size).records
 
@@ -75,7 +91,12 @@ class EventsController < ApplicationController
       total: total,
       total_pages: total_pages,
       page: page,
-      years: years,
+      year_months: year_months,
+      sources: sources,
+      prefixes: prefixes,
+      relation_types: relation_types,
+      metric_types: metric_types,
+      access_methods: access_methods
     }.compact
 
     render jsonapi: @events, meta: meta, include: @include

@@ -71,18 +71,23 @@ class Event < ActiveRecord::Base
     indexes :uuid,             type: :keyword
     indexes :subj_id,          type: :keyword
     indexes :obj_id,           type: :keyword
+    indexes :doi,              type: :keyword
+    indexes :prefix,           type: :keyword
     indexes :subj,             type: :text
     indexes :obj,              type: :text
     indexes :source_id,        type: :keyword
     indexes :source_token,     type: :keyword
     indexes :message_action,   type: :keyword
     indexes :relation_type_id, type: :keyword
+    indexes :access_method,    type: :keyword
+    indexes :metric_type,      type: :keyword
     indexes :total,            type: :integer
     indexes :license,          type: :text, fields: { keyword: { type: "keyword" }}
     indexes :error_messages,   type: :text
     indexes :callback,         type: :text
     indexes :aasm_state,       type: :keyword
     indexes :state_event,      type: :keyword
+    indexes :year_month,       type: :keyword
     indexes :created_at,       type: :date
     indexes :updated_at,       type: :date
     indexes :indexed_at,       type: :date
@@ -94,15 +99,20 @@ class Event < ActiveRecord::Base
       "uuid" => uuid,
       "subj_id" => subj_id,
       "obj_id" => obj_id,
+      "doi" => doi,
+      "prefix" => prefix,
       "source_id" => source_id,
       "source_token" => source_token,
       "message_action" => message_action,
       "relation_type_id" => relation_type_id,
+      "access_method" => access_method,
+      "metric_type" => metric_type,
       "total" => total,
       "license" => license,
       "error_messages" => error_messages,
       "aasm_state" => aasm_state,
       "state_event" => state_event,
+      "year_month" => year_month,
       "created_at" => created_at,
       "updated_at" => updated_at,
       "indexed_at" => indexed_at,
@@ -116,8 +126,12 @@ class Event < ActiveRecord::Base
 
   def self.query_aggregations
     {
-      years: { date_histogram: { field: 'occurred_at', interval: 'year', min_doc_count: 1 } },
-      months: { date_histogram: { field: 'occurred_at', interval: 'year', min_doc_count: 1 } }
+      year_months: { date_histogram: { field: 'occurred_at', interval: 'month', min_doc_count: 1 } },
+      sources: { terms: { field: 'source_id', size: 10, min_doc_count: 1 } },
+      prefixes: { terms: { field: 'prefix', size: 10, min_doc_count: 1 } },
+      relation_types: { terms: { field: 'relation_type_id', size: 10, min_doc_count: 1 } },
+      metric_types: { terms: { field: 'metric_type', size: 10, min_doc_count: 1 } },
+      access_methods: { terms: { field: 'access_method', size: 10, min_doc_count: 1 } }
     }
   end
 
@@ -138,8 +152,40 @@ class Event < ActiveRecord::Base
     Maremma.post(callback, data: data.to_json, token: ENV['API_KEY'])
   end
 
+  def access_method
+    if relation_type_id.to_s =~ /(requests|investigations)/
+      relation_type_id.split("-").last if relation_type_id.present?
+    end
+  end
+
+  def metric_type
+    if relation_type_id.to_s =~ /(requests|investigations)/
+      arr = relation_type_id.split("-", 4)
+      arr[0..2].join("-")
+    end
+  end
+
+  def doi
+    doi_from_url(obj_id) if obj_id.present?
+  end
+
+  def prefix
+    doi.split('/', 2).first if doi.present?
+  end
+
+  def doi_from_url(url)
+    if /\A(?:(http|https):\/\/(dx\.)?(doi.org|handle.test.datacite.org)\/)?(doi:)?(10\.\d{4,5}\/.+)\z/.match(url)
+      uri = Addressable::URI.parse(url)
+      uri.path.gsub(/^\//, '').downcase
+    end
+  end
+
   def timestamp
     updated_at.utc.iso8601 if updated_at.present?
+  end
+
+  def year_month
+    occurred_at.utc.iso8601[0..6] if occurred_at.present?
   end
 
   def cache_key
