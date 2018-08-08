@@ -81,7 +81,7 @@ class EventsController < ApplicationController
     year_months = total > 0 ? facet_by_year_month(response.response.aggregations.year_months.buckets) : nil
     sources = total > 0 ? facet_by_source(response.response.aggregations.sources.buckets) : nil
     prefixes = total > 0 ? facet_by_source(response.response.aggregations.prefixes.buckets) : nil
-    relation_types = total > 0 ? facet_by_key(response.response.aggregations.relation_types.buckets) : nil
+    relation_types = total > 0 ? facet_by_relation_type(response.response.aggregations.relation_types.buckets) : nil
     metric_types = total > 0 ? facet_by_metric_type(response.response.aggregations.metric_types.buckets) : nil
     access_methods = total > 0 ? facet_by_key(response.response.aggregations.access_methods.buckets) : nil
 

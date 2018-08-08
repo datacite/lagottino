@@ -129,7 +129,7 @@ class Event < ActiveRecord::Base
       year_months: { date_histogram: { field: 'occurred_at', interval: 'month', min_doc_count: 1 } },
       sources: { terms: { field: 'source_id', size: 10, min_doc_count: 1 } },
       prefixes: { terms: { field: 'prefix', size: 10, min_doc_count: 1 } },
-      relation_types: { terms: { field: 'relation_type_id', size: 10, min_doc_count: 1 } },
+      relation_types: { terms: { field: 'relation_type_id', size: 10, min_doc_count: 1 }, aggs: { "total_by_relation_type_id" => { sum: { field: 'total' }}} },
       metric_types: { terms: { field: 'metric_type', size: 10, min_doc_count: 1 } },
       access_methods: { terms: { field: 'access_method', size: 10, min_doc_count: 1 } }
     }

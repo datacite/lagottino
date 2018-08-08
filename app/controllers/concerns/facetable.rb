@@ -33,6 +33,15 @@ module Facetable
       end
     end
 
+    def facet_by_relation_type(arr)
+      arr.map do |hsh|
+        { "id" => hsh["key"],
+          "title" => hsh["key"],
+          "count" => hsh["doc_count"],
+          "sum" => hsh.dig("total_by_relation_type_id", "value") }
+      end
+    end
+
     def facet_by_metric_type(arr)
       arr.map do |hsh|
         { "id" => hsh["key"],
