@@ -21,7 +21,8 @@ module Facetable
 
         { "id" => hsh["key_as_string"][0..6],
           "title" => title,
-          "count" => hsh["doc_count"] }
+          "count" => hsh["doc_count"],
+          "sum" => hsh.dig("total_by_year_month", "value") }
       end
     end
 
@@ -35,10 +36,20 @@ module Facetable
 
     def facet_by_relation_type(arr)
       arr.map do |hsh|
+        arr = hsh.dig("year_months", "buckets").map do |h|
+          month = h["key_as_string"][5..6].to_i
+          title = I18n.t("date.month_names")[month] + " " + h["key_as_string"][0..3]
+
+          {
+            "id" => h["key_as_string"][0..6],
+            "title" => title,
+            "sum" => h.dig("total_by_year_month", "value") }
+        end
+
         { "id" => hsh["key"],
           "title" => hsh["key"],
           "count" => hsh["doc_count"],
-          "sum" => hsh.dig("total_by_relation_type_id", "value") }
+          "year-months" => arr }
       end
     end
 

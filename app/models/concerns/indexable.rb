@@ -73,12 +73,10 @@ module Indexable
       must << { term: { doi: options[:doi].downcase }} if options[:doi].present?
       must << { term: { year_month: options[:year_month] }} if options[:year_month].present?
       must << { range: { occurred_at: { gte: "#{options[:occurred_at].split(",").min}||/y", lte: "#{options[:occurred_at].split(",").max}||/y", format: "yyyy" }}} if options[:occurred_at].present?
-      must << { term: { prefix: options[:prefix] }} if options[:prefix].present?
-      must << { term: { source_id: options[:source_id] }} if options[:source_id].present?
-      must << { term: { relation_type_id: options[:relation_type_id] }} if options[:relation_type_id].present?
-      must << { term: { metric_type: options[:metric_type] }} if options[:metric_type].present?
-      must << { term: { access_method: options[:access_method] }} if options[:access_method].present?
-
+      must << { terms: { prefix: options[:prefix].split(",") }} if options[:prefix].present?
+      must << { terms: { source_id: options[:source_id].split(",") }} if options[:source_id].present?
+      must << { terms: { relation_type_id: options[:relation_type_id].split(",") }} if options[:relation_type_id].present?
+      
       must_not = []
 
       __elasticsearch__.search({

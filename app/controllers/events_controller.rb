@@ -78,12 +78,9 @@ class EventsController < ApplicationController
 
     total = response.results.total
     total_pages = (total.to_f / size).ceil
-    year_months = total > 0 ? facet_by_year_month(response.response.aggregations.year_months.buckets) : nil
     sources = total > 0 ? facet_by_source(response.response.aggregations.sources.buckets) : nil
     prefixes = total > 0 ? facet_by_source(response.response.aggregations.prefixes.buckets) : nil
     relation_types = total > 0 ? facet_by_relation_type(response.response.aggregations.relation_types.buckets) : nil
-    metric_types = total > 0 ? facet_by_metric_type(response.response.aggregations.metric_types.buckets) : nil
-    access_methods = total > 0 ? facet_by_key(response.response.aggregations.access_methods.buckets) : nil
 
     @events = response.page(page).per(size).records
 
@@ -91,12 +88,9 @@ class EventsController < ApplicationController
       total: total,
       total_pages: total_pages,
       page: page,
-      year_months: year_months,
       sources: sources,
       prefixes: prefixes,
-      relation_types: relation_types,
-      metric_types: metric_types,
-      access_methods: access_methods
+      relation_types: relation_types
     }.compact
 
     render jsonapi: @events, meta: meta, include: @include
