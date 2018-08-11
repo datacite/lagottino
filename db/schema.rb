@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_05_16_054039) do
+ActiveRecord::Schema.define(version: 2018_08_11_073526) do
 
-  create_table "events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "events", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.text "uuid", null: false
     t.string "subj_id", limit: 191, null: false
     t.string "obj_id", limit: 191
@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(version: 2018_05_16_054039) do
     t.datetime "updated_at", null: false
     t.datetime "indexed_at", default: "1970-01-01 00:00:00", null: false
     t.datetime "occurred_at"
-    t.string "message_action", limit: 191, default: "add", null: false
+    t.string "message_action", limit: 191, default: "create", null: false
     t.string "relation_type_id", limit: 191
     t.text "subj"
     t.text "obj"
