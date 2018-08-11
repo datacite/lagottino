@@ -61,9 +61,6 @@ class Event < ActiveRecord::Base
 
   attr_accessor :container_title, :url
 
-  scope :by_state, ->(state) { where("aasm_state = ?", state) }
-  scope :order_by_date, -> { order("updated_at DESC") }
-
   # use different index for testing
   index_name Rails.env.test? ? "events-test" : "events"
 
@@ -126,11 +123,9 @@ class Event < ActiveRecord::Base
 
   def self.query_aggregations
     {
-      year_months: { date_histogram: { field: 'occurred_at', interval: 'month', min_doc_count: 1 }, aggs: { "total_by_year_month" => { sum: { field: 'total' }}} },
       sources: { terms: { field: 'source_id', size: 10, min_doc_count: 1 } },
       prefixes: { terms: { field: 'prefix', size: 10, min_doc_count: 1 } },
       relation_types: { terms: { field: 'relation_type_id', size: 10, min_doc_count: 1 }, aggs: { year_months: { date_histogram: { field: 'occurred_at', interval: 'month', min_doc_count: 1 }, aggs: { "total_by_year_month" => { sum: { field: 'total' }}}}} }
-      # relation_types: { terms: { field: 'relation_type_id', size: 10, min_doc_count: 1 }, aggs: { "total_by_relation_type_id" => { sum: { field: 'total' }}} }
     }
   end
 
@@ -165,11 +160,11 @@ class Event < ActiveRecord::Base
   end
 
   def doi
-    doi_from_url(obj_id) if obj_id.present?
+    [doi_from_url(subj_id), doi_from_url(obj_id)].compact
   end
 
   def prefix
-    doi.split('/', 2).first if doi.present?
+    [doi.map { |d| d.to_s.split('/', 2).first }].compact
   end
 
   def doi_from_url(url)
