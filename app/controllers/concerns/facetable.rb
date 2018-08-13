@@ -3,9 +3,9 @@ module Facetable
 
   SOURCES = {
     "datacite-usage" => "DataCite Usage Stats",
-    "datacite-crossref" => "DataCite to Crossref",
     "datacite-related" => "DataCite Related Identifiers",
-    "datacite-other" => "DataCite Other Identifiers"
+    "datacite-crossref" => "DataCite to Crossref",
+    "datacite-kisti" => "DataCite to KISTI"
   }
 
   included do
