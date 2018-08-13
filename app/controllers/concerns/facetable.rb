@@ -2,7 +2,10 @@ module Facetable
   extend ActiveSupport::Concern
 
   SOURCES = {
-    "datacite-usage" => "DataCite Usage Stats"
+    "datacite-usage" => "DataCite Usage Stats",
+    "datacite-crossref" => "DataCite to Crossref",
+    "datacite-related" => "DataCite Related Identifiers",
+    "datacite-other" => "DataCite Other Identifiers"
   }
 
   included do
