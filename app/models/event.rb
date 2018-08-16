@@ -81,8 +81,8 @@ class Event < ActiveRecord::Base
     indexes :obj_id,           type: :keyword
     indexes :doi,              type: :keyword
     indexes :prefix,           type: :keyword
-    indexes :subj,             type: :text
-    indexes :obj,              type: :text
+    indexes :subj,             type: :object
+    indexes :obj,              type: :object
     indexes :source_id,        type: :keyword
     indexes :source_token,     type: :keyword
     indexes :message_action,   type: :keyword
@@ -91,7 +91,7 @@ class Event < ActiveRecord::Base
     indexes :metric_type,      type: :keyword
     indexes :total,            type: :integer
     indexes :license,          type: :text, fields: { keyword: { type: "keyword" }}
-    indexes :error_messages,   type: :text
+    indexes :error_messages,   type: :object
     indexes :callback,         type: :text
     indexes :aasm_state,       type: :keyword
     indexes :state_event,      type: :keyword
@@ -107,6 +107,8 @@ class Event < ActiveRecord::Base
       "uuid" => uuid,
       "subj_id" => subj_id,
       "obj_id" => obj_id,
+      "subj" => subj,
+      "obj" => obj,
       "doi" => doi,
       "prefix" => prefix,
       "source_id" => source_id,
