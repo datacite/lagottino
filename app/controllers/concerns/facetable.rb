@@ -5,7 +5,13 @@ module Facetable
     "datacite-usage" => "DataCite Usage Stats",
     "datacite-related" => "DataCite Related Identifiers",
     "datacite-crossref" => "DataCite to Crossref",
-    "datacite-kisti" => "DataCite to KISTI"
+    "datacite-kisti" => "DataCite to KISTI",
+    "datacite-cnki" => "DataCite to CNKI",
+    "datacite-istic" => "DataCite to ISTIC",
+    "datacite-medra" => "DataCite to mEDRA",
+    "datacite-op" => "DataCite to OP",
+    "datacite-jalc" => "DataCite to JaLC",
+    "datacite-airiti" => "DataCite to Airiti"
   }
 
   included do
