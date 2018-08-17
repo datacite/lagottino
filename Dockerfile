@@ -52,7 +52,7 @@ RUN gem update --system && \
 # Run additional scripts during container startup (i.e. not at build time)
 WORKDIR /home/app/webapp
 RUN mkdir -p /etc/my_init.d
-COPY vendor/docker/90_migrate.sh /etc/my_init.d/90_migrate.sh
+# COPY vendor/docker/90_migrate.sh /etc/my_init.d/90_migrate.sh
 
 # Expose web
 EXPOSE 80
