@@ -52,13 +52,26 @@ class EventsController < ApplicationController
   end
 
   def index
-    cursor = params.dig(:page, :cursor)
-    size = (params.dig(:page, :size) || 1000).to_i
+    sort = case params[:sort]
+           when "relevance" then { "_score" => { order: 'desc' }}
+           when "obj_id" then { "obj_id" => { order: 'asc' }}
+           when "-obj_id" then { "obj_id" => { order: 'desc' }}
+           when "total" then { "total" => { order: 'asc' }}
+           when "-total" then { "total" => { order: 'desc' }}
+           when "created" then { created_at: { order: 'asc' }}
+           when "-created" then { created_at: { order: 'desc' }}
+           else nil
+           end
+
+    page = params[:page] || {}
+    page[:size] = (1..1000).include?(page[:size].to_i) ? page[:size].to_i : 1000
+    page[:number] = page[:number].to_i > 0 ? [page[:number].to_i, 10000/page[:size]].min : 1
+    page[:cursor] = page[:cursor].presence || -1
 
     if params[:id].present?
       response = Event.find_by_id(params[:id]) 
     elsif params[:ids].present?
-      response = Event.find_by_ids(params[:ids], cursor: cursor, size: size)
+      response = Event.find_by_ids(params[:ids], page: page, sort: sort)
     else
       response = Event.query(params[:query],
                              subj_id: params[:subj_id],
@@ -67,15 +80,13 @@ class EventsController < ApplicationController
                              prefix: params[:prefix],
                              source_id: params[:source_id], 
                              relation_type_id: params[:relation_type_id],
-                             metric_type: params[:metric_type],
-                             access_method: params[:access_method],
                              year_month: params[:year_month], 
-                             cursor: cursor, 
-                             size: size)
+                             page: page,
+                             sort: sort)
     end
 
     total = response.results.total
-    total_pages = (total.to_f / size).ceil
+    total_pages = (total.to_f / page[:size]).ceil
     sources = total > 0 ? facet_by_source(response.response.aggregations.sources.buckets) : nil
     prefixes = total > 0 ? facet_by_source(response.response.aggregations.prefixes.buckets) : nil
     relation_types = total > 0 ? facet_by_relation_type(response.response.aggregations.relation_types.buckets) : nil
@@ -94,8 +105,16 @@ class EventsController < ApplicationController
     options[:links] = {
       self: request.original_url,
       next: @events.blank? ? nil : request.base_url + "/events?" + {
-        "page[cursor]" => @events.last["sort"].first,
-        "page[size]" => params.dig("page", "size") }.compact.to_query
+        "query" => params[:query],
+        "subj-id" => params[:subj_id],
+        "obj-id" => params[:obj_id],
+        "doi" => params[:doi],
+        "prefix" => params[:prefix],
+        "source-id" => params[:source_id],
+        "relation-type-id" => params[:relation_type_id],
+        "year-month" => params[:year_month],
+        "page[cursor]" => @events.last[:sort].first,
+        "page[size]" => params.dig(:page, :size) }.compact.to_query
       }.compact
     options[:include] = @include
     options[:is_collection] = true

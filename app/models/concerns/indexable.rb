@@ -49,7 +49,9 @@ module Indexable
     end
 
     def query(query, options={})
-      options[:cursor] ||= -1
+      from = options.dig(:page, :cursor).present? ? 0 : (options.dig(:page, :number) - 1) * options.dig(:page, :size)
+      search_after = options.dig(:page, :cursor).present? ? [options.dig(:page, :cursor)] : nil
+      sort = options.dig(:page, :cursor).present? ? [{ updated_at: { order: 'asc' }}] : options[:sort]
 
       must = []
       must << { multi_match: { query: query, fields: query_fields, type: "phrase_prefix", max_expansions: 50 }} if query.present?
@@ -65,10 +67,10 @@ module Indexable
       must_not = []
 
       __elasticsearch__.search({
-        size: options[:size] || 1000,
-        from: 0,
-        search_after: [options[:cursor]],
-        sort: [{ updated_at: { order: 'asc' }}],
+        size: options.dig(:page, :size),
+        from: from,
+        search_after: search_after,
+        sort: sort,
         query: {
           bool: {
             must: must,
@@ -76,7 +78,7 @@ module Indexable
           }
         },
         aggregations: query_aggregations
-      })
+      }.compact)
     end
 
     def recreate_index(options={})
