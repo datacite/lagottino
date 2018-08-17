@@ -17,12 +17,12 @@ module Indexable
     end
 
     def find_by_id_list(ids, options={})
-      options[:sort] ||= { "_doc" => { order: 'asc' }}
+      options[:cursor] ||= -1
 
       __elasticsearch__.search({
-        from: options[:from] || 0,
-        size: options[:size] || 25,
-        sort: [options[:sort]],
+        size: options[:size] || 1000,
+        search_after: options[:cursor],
+        sort: [{ updated_at: { order: 'asc' }}],
         query: {
           terms: {
             id: ids.split(",")
@@ -33,12 +33,12 @@ module Indexable
     end
 
     def find_by_ids(ids, options={})
-      options[:sort] ||= { "_doc" => { order: 'asc' }}
+      options[:cursor] ||= -1
 
       __elasticsearch__.search({
-        from: options[:from] || 0,
-        size: options[:size] || 25,
-        sort: [options[:sort]],
+        size: options[:size] || 1000,
+        search_after: options[:cursor],
+        sort: [{ updated_at: { order: 'asc' }}],
         query: {
           terms: {
             obj_id: ids.split(",").map(&:upcase)
@@ -49,7 +49,7 @@ module Indexable
     end
 
     def query(query, options={})
-      options[:sort] ||= { "_doc" => { order: 'asc' }}
+      options[:cursor] ||= -1
 
       must = []
       must << { multi_match: { query: query, fields: query_fields, type: "phrase_prefix", max_expansions: 50 }} if query.present?
@@ -65,9 +65,10 @@ module Indexable
       must_not = []
 
       __elasticsearch__.search({
-        from: options[:from] || 0,
-        size: options[:size] || 25,
-        sort: [options[:sort]],
+        size: options[:size] || 1000,
+        from: 0,
+        search_after: [options[:cursor]],
+        sort: [{ updated_at: { order: 'asc' }}],
         query: {
           bool: {
             must: must,

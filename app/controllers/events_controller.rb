@@ -42,24 +42,13 @@ class EventsController < ApplicationController
   end
 
   def index
-    page = (params.dig(:page, :number) || 1).to_i
-    size = (params.dig(:page, :size) || 25).to_i
-    from = (page - 1) * size
-
-    sort = case params[:sort]
-           when "relevance" then { "_score" => { order: 'desc' }}
-           when "-obj_id" then { "obj_id" => { order: 'desc' }}
-           when "total" then { "total" => { order: 'asc' }}
-           when "-total" then { "total" => { order: 'desc' }}
-           when "created" then { created_at: { order: 'asc' }}
-           when "-created" then { created_at: { order: 'desc' }}
-           else { "obj_id" => { order: "asc" }}
-           end
+    cursor = params.dig(:page, :cursor)
+    size = (params.dig(:page, :size) || 1000).to_i
 
     if params[:id].present?
       response = Event.find_by_id(params[:id]) 
     elsif params[:ids].present?
-      response = Event.find_by_ids(params[:ids], from: from, size: size, sort: sort)
+      response = Event.find_by_ids(params[:ids], cursor: cursor, size: size)
     else
       response = Event.query(params[:query],
                              subj_id: params[:subj_id],
@@ -71,9 +60,8 @@ class EventsController < ApplicationController
                              metric_type: params[:metric_type],
                              access_method: params[:access_method],
                              year_month: params[:year_month], 
-                             from: from, 
-                             size: size, 
-                             sort: sort)
+                             cursor: cursor, 
+                             size: size)
     end
 
     total = response.results.total
@@ -82,18 +70,27 @@ class EventsController < ApplicationController
     prefixes = total > 0 ? facet_by_source(response.response.aggregations.prefixes.buckets) : nil
     relation_types = total > 0 ? facet_by_relation_type(response.response.aggregations.relation_types.buckets) : nil
 
-    @events = response.page(page).per(size).records
+    @events = response.results.results
 
-    meta = {
+    options = {}
+    options[:meta] = {
       total: total,
       total_pages: total_pages,
-      page: page,
       sources: sources,
       prefixes: prefixes,
       relation_types: relation_types
     }.compact
 
-    render jsonapi: @events, meta: meta, include: @include
+    options[:links] = {
+      self: request.original_url,
+      next: @events.blank? ? nil : request.base_url + "/events?" + {
+        "page[cursor]" => @events.last["sort"].first,
+        "page[size]" => params.dig("page", "size") }.compact.to_query
+      }.compact
+    options[:include] = @include
+    options[:is_collection] = true
+
+    render json: EventSerializer.new(@events, options).serialized_json, status: :ok
   end
 
   def destroy
@@ -101,7 +98,7 @@ class EventsController < ApplicationController
       render json: { data: {} }, status: :ok
     else
       errors = @event.errors.full_messages.map { |message| { status: 422, title: message } }
-      render jsonapi: { errors: errors }, status: :unprocessable_entity
+      render json: { errors: errors }, status: :unprocessable_entity
     end
   end
 
