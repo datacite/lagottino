@@ -13,7 +13,10 @@ class EventsController < ApplicationController
     authorize! :create, @event
 
     if @event.save
-      render json: @event, :status => :created
+      options = {}
+      options[:is_collection] = false
+      
+      render json: EventSerializer.new(@event, options).serialized_json, status: :created
     else
       errors = @event.errors.full_messages.map { |message| { status: 422, title: message } }
       render json: { errors: errors }, status: :unprocessable_entity
@@ -30,7 +33,10 @@ class EventsController < ApplicationController
     authorize! :update, @event
 
     if @event.update_attributes(safe_params)
-      render jsonapi: @event, status: exists ? :ok : :created
+      options = {}
+      options[:is_collection] = false
+      
+      render json: EventSerializer.new(@event, options).serialized_json, status: exists ? :ok : :created
     else
       errors = @event.errors.full_messages.map { |message| { status: 422, title: message } }
       render json: { errors: errors }, status: :unprocessable_entity
@@ -38,7 +44,11 @@ class EventsController < ApplicationController
   end
 
   def show
-    render jsonapi: @event
+    options = {}
+    options[:include] = @include
+    options[:is_collection] = false
+
+    render json: EventSerializer.new(@event, options).serialized_json, status: :ok
   end
 
   def index
@@ -99,16 +109,6 @@ class EventsController < ApplicationController
     else
       errors = @event.errors.full_messages.map { |message| { status: 422, title: message } }
       render json: { errors: errors }, status: :unprocessable_entity
-    end
-  end
-
-  # use cached counts for total number of results
-  def get_total_entries(params)
-    case
-    when params[:source_token] && params[:state] then Event.cached_event_source_token_state_count(params[:source_token], params[:state])
-    when params[:source_token] then Event.cached_event_source_token_count(params[:source_token])
-    when Rails.env.development? || Rails.env.test? then Event.count
-    else Event.cached_event_count
     end
   end
 

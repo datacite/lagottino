@@ -233,7 +233,7 @@ describe "/events", :type => :request do
         put uri, params, headers
 
         expect(last_response.status).to eq(201)
-
+        puts last_response.body
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to be_nil
         expect(response.dig("data", "id")).to eq(event.uuid)
