@@ -49,9 +49,15 @@ module Indexable
     end
 
     def query(query, options={})
-      from = options.dig(:page, :cursor).present? ? 0 : (options.dig(:page, :number) - 1) * options.dig(:page, :size)
-      search_after = options.dig(:page, :cursor).present? ? [options.dig(:page, :cursor)] : nil
-      sort = options.dig(:page, :cursor).present? ? [{ updated_at: { order: 'asc' }}] : options[:sort]
+      if options.dig(:page, :cursor).present?
+        from = 0
+        search_after = [options.dig(:page, :cursor)]
+        sort = [{ updated_at: { order: 'asc' }}]
+      else
+        from = (options.dig(:page, :number) - 1) * options.dig(:page, :size)
+        search_after = nil
+        sort = options[:sort]
+      end
 
       must = []
       must << { multi_match: { query: query, fields: query_fields, type: "phrase_prefix", max_expansions: 50 }} if query.present?

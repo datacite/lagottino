@@ -60,13 +60,12 @@ class EventsController < ApplicationController
            when "-total" then { "total" => { order: 'desc' }}
            when "created" then { created_at: { order: 'asc' }}
            when "-created" then { created_at: { order: 'desc' }}
-           else nil
+           else { updated_at: { order: 'asc' }}
            end
 
     page = params[:page] || {}
     page[:size] = (1..1000).include?(page[:size].to_i) ? page[:size].to_i : 1000
     page[:number] = page[:number].to_i > 0 ? [page[:number].to_i, 10000/page[:size]].min : 1
-    page[:cursor] = page[:cursor].presence || -1
 
     if params[:id].present?
       response = Event.find_by_id(params[:id]) 
