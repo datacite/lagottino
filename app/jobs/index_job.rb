@@ -3,5 +3,6 @@ class IndexJob < ActiveJob::Base
 
   def perform(obj)
     obj.__elasticsearch__.index_document
+    Rails.logger.info "Indexing event #{obj.uuid}."
   end
 end
