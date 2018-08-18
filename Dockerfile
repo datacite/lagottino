@@ -49,10 +49,13 @@ RUN gem update --system && \
     gem install bundler && \
     /sbin/setuser app bundle install --path vendor/bundle
 
+# Add Runit script for shoryuken workers
+RUN mkdir /etc/service/shoryuken
+ADD vendor/docker/shoryuken.sh /etc/service/shoryuken/run
+
 # Run additional scripts during container startup (i.e. not at build time)
-WORKDIR /home/app/webapp
 RUN mkdir -p /etc/my_init.d
-# COPY vendor/docker/90_migrate.sh /etc/my_init.d/90_migrate.sh
+COPY vendor/docker/80_flush_cache.sh /etc/my_init.d/80_flush_cache.sh
 
 # Expose web
 EXPOSE 80
