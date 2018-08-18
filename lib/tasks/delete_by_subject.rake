@@ -1,10 +1,8 @@
 namespace :event do
-  desc 'Delete events by subject'
-  task :detete_by_subject, [:subj_id] => :environment do |task, args|
-    collection = Event.where(subj_id: args[:subj_id])
-    uuids = collection.map { |i|  i[:uuid]  }
-    uuids.each do |uuid| 
-      puts "#{uuid} deleted" if Event.where(uuid: uuid).first.delete.destroyed?
+  desc 'Delete events by subj_id'
+  task :detete_by_sub_id, [:subj_id] => :environment do |task, args|
+    Event.where(subj_id: args[:subj_id]).find_each do |event|
+      puts "#{event.uuid} deleted" if event.destroy
     end
   end
 end
