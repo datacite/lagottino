@@ -15,19 +15,6 @@ class Event < ActiveRecord::Base
 
   before_validation :set_defaults
 
-  after_commit on: [:create, :update] do
-    # use index_document instead of update_document to also update virtual attributes
-    IndexJob.perform_later(self)
-  end
-
-  before_destroy do
-    begin
-      __elasticsearch__.delete_document
-    rescue Elasticsearch::Transport::Transport::Errors::NotFound
-      nil
-    end
-  end
-
   validates :uuid, format: { with: /\A[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/i }
 
   # include state machine

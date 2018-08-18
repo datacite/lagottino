@@ -1,5 +1,20 @@
 module Indexable
   extend ActiveSupport::Concern
+
+  included do
+    after_commit on: [:create, :update] do
+      # use index_document instead of update_document to also update virtual attributes
+      IndexJob.perform_later(self)
+    end
+  
+    before_destroy do
+      begin
+        __elasticsearch__.delete_document
+      rescue Elasticsearch::Transport::Transport::Errors::NotFound
+        nil
+      end
+    end
+  end
    
   module ClassMethods
     # don't raise an exception when not found
