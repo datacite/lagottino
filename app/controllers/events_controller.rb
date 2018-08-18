@@ -95,10 +95,10 @@ class EventsController < ApplicationController
     options = {}
     options[:meta] = {
       total: total,
-      total_pages: total_pages,
+      "total-pages" => total_pages,
       sources: sources,
       prefixes: prefixes,
-      relation_types: relation_types
+      "relation-types" => relation_types
     }.compact
 
     options[:links] = {
