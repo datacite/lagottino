@@ -123,9 +123,9 @@ class Event < ActiveRecord::Base
 
   def self.query_aggregations
     {
-      sources: { terms: { field: 'source_id', size: 10, min_doc_count: 1 } },
-      prefixes: { terms: { field: 'prefix', size: 10, min_doc_count: 1 } },
-      relation_types: { terms: { field: 'relation_type_id', size: 10, min_doc_count: 1 }, aggs: { year_months: { date_histogram: { field: 'occurred_at', interval: 'month', min_doc_count: 1 }, aggs: { "total_by_year_month" => { sum: { field: 'total' }}}}} }
+      sources: { terms: { field: 'source_id', size: 50, min_doc_count: 1 } },
+      prefixes: { terms: { field: 'prefix', size: 50, min_doc_count: 1 } },
+      relation_types: { terms: { field: 'relation_type_id', size: 50, min_doc_count: 1 }, aggs: { year_months: { date_histogram: { field: 'occurred_at', interval: 'month', min_doc_count: 1 }, aggs: { "total_by_year_month" => { sum: { field: 'total' }}}}} }
     }
   end
 
