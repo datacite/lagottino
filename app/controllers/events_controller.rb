@@ -64,8 +64,9 @@ class EventsController < ApplicationController
            end
 
     page = params[:page] || {}
-    page[:size] = (1..1000).include?(page[:size].to_i) ? page[:size].to_i : 1000
-    page[:number] = page[:number].to_i > 0 ? [page[:number].to_i, 10000/page[:size]].min : 1
+    page[:size] = (0..1000).include?(page[:size].to_i) ? page[:size].to_i : 1000
+    max_number = page[:size] > 0 ?  10000/page[:size] : 1
+    page[:number] = page[:number].to_i > 0 ? [page[:number].to_i, max_number].min : 1
 
     if params[:id].present?
       response = Event.find_by_id(params[:id]) 
@@ -85,7 +86,7 @@ class EventsController < ApplicationController
     end
 
     total = response.results.total
-    total_pages = (total.to_f / page[:size]).ceil
+    total_pages = page[:size] > 0 ? (total.to_f / page[:size]).ceil : 0
     sources = total > 0 ? facet_by_source(response.response.aggregations.sources.buckets) : nil
     prefixes = total > 0 ? facet_by_source(response.response.aggregations.prefixes.buckets) : nil
     relation_types = total > 0 ? facet_by_relation_type(response.response.aggregations.relation_types.buckets) : nil
