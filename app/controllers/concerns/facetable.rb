@@ -11,7 +11,10 @@ module Facetable
     "datacite-medra" => "DataCite to mEDRA",
     "datacite-op" => "DataCite to OP",
     "datacite-jalc" => "DataCite to JaLC",
-    "datacite-airiti" => "DataCite to Airiti"
+    "datacite-airiti" => "DataCite to Airiti",
+    "datacite-url" => "DataCite URL Links",
+    "datacite-funder" => "DataCite Funder Information",
+    "crossref" => "Crossref to DataCite"
   }
 
   included do
