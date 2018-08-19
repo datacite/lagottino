@@ -64,8 +64,13 @@ class EventsController < ApplicationController
            end
 
     page = params[:page] || {}
-    page[:size] = (0..1000).include?(page[:size].to_i) ? page[:size].to_i : 1000
-    max_number = page[:size] > 0 ?  10000/page[:size] : 1
+    if page[:size].present? 
+      page[:size] = [page[:size].to_i, 1000].min
+      max_number = 1
+    else
+      page[:size] = 1000
+      max_number = 10000/page[:size]
+    end
     page[:number] = page[:number].to_i > 0 ? [page[:number].to_i, max_number].min : 1
 
     if params[:id].present?
