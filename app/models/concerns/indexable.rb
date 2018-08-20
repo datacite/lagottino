@@ -35,7 +35,8 @@ module Indexable
       options[:cursor] ||= -1
 
       __elasticsearch__.search({
-        size: options[:size] || 1000,
+        size: 1000,
+        from: 0,
         search_after: options[:cursor],
         sort: [{ updated_at: { order: 'asc' }}],
         query: {
@@ -51,7 +52,8 @@ module Indexable
       options[:cursor] ||= -1
 
       __elasticsearch__.search({
-        size: options[:size] || 1000,
+        size: 1000,
+        from: 0,
         search_after: options[:cursor],
         sort: [{ updated_at: { order: 'asc' }}],
         query: {
