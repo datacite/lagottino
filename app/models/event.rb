@@ -163,6 +163,7 @@ class Event < ActiveRecord::Base
     {
       sources: { terms: { field: 'source_id', size: 50, min_doc_count: 1 } },
       prefixes: { terms: { field: 'prefix', size: 50, min_doc_count: 1 } },
+      citation_types: { terms: { field: 'citation_type', size: 50, min_doc_count: 1 }, aggs: { year_months: { date_histogram: { field: 'occurred_at', interval: 'month', min_doc_count: 1 }, aggs: { "total_by_year_month" => { sum: { field: 'total' }}}}} },
       relation_types: { terms: { field: 'relation_type_id', size: 50, min_doc_count: 1 }, aggs: { year_months: { date_histogram: { field: 'occurred_at', interval: 'month', min_doc_count: 1 }, aggs: { "total_by_year_month" => { sum: { field: 'total' }}}}} }
     }
   end
@@ -214,12 +215,9 @@ class Event < ActiveRecord::Base
   end
 
   def citation_type
-    ct = [subj["type"], obj["type"]].compact.sort
-    if ct.present?
-      ct.join("-")
-    else
-      nil
-    end
+    return nil if subj["type"].blank? || subj["type"] == "creative-work" || obj["type"].blank? || obj["type"] == "creative-work"
+
+   [subj["type"], obj["type"]].compact.sort.join("-")
   end
 
   def doi_from_url(url)
