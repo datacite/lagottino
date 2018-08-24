@@ -9,14 +9,23 @@ class EventsController < ApplicationController
   authorize_resource only: [:destroy]
 
   def create
-    @event = Event.new(safe_params.except(:format))
+    @event = Event.where(subj_id: safe_params[:subj_id])
+                  .where(obj_id: safe_params[:obj_id])
+                  .where(source_id: safe_params[:source_id])
+                  .where(relation_type_id: safe_params[:relation_type_id])
+                  .first
+    exists = @event.present?
+
+    # create event if it doesn't exist already
+    @event = Event.new(safe_params.except(:format)) unless @event.present?
+
     authorize! :create, @event
 
-    if @event.save
+    if @event.update_attributes(safe_params)
       options = {}
       options[:is_collection] = false
       
-      render json: EventSerializer.new(@event, options).serialized_json, status: :created
+      render json: EventSerializer.new(@event, options).serialized_json, status: exists ? :ok : :created
     else
       errors = @event.errors.full_messages.map { |message| { status: 422, title: message } }
       render json: { errors: errors }, status: :unprocessable_entity

@@ -196,19 +196,18 @@ describe "/events", :type => :request do
       end
     end
 
-    context "duplicate entry" do
+    context "existing entry" do
       let!(:event) { create(:event) }
 
       it "JSON" do
         post uri, params, headers
 
-        expect(last_response.status).to eq(409)
+        expect(last_response.status).to eq(200)
 
         response = JSON.parse(last_response.body)
-        error = response["errors"].first
-        expect(error["status"]).to eq("409")
-        expect(error["title"]).to eq("The resource already exists.")
-        expect(response["data"]).to be_blank
+        expect(response["errors"]).to be_nil
+        expect(response.dig("data", "id")).to eq(event.uuid)
+        expect(response.dig("data", "attributes", "subj-id")).to eq("http://www.citeulike.org/user/dbogartoit")
       end
     end
   end
