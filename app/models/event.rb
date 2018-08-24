@@ -77,15 +77,15 @@ class Event < ActiveRecord::Base
       name: { type: :text },
       author: { type: :object },
       periodical: { type: :text },
-      "alternate-name" => { type: :text },
-      "volume-number" => { type: :keyword },
-      "issue-number" => { type: :keyword },
+      alternate_name: { type: :text },
+      volume_number: { type: :keyword },
+      issue_number: { type: :keyword },
       pagination: { type: :keyword },
       publisher: { type: :keyword },
       version: { type: :keyword },
       issn: { type: :keyword },
-      "date-published" => { type: :date, format: "yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
-      "provider-id" => { type: :keyword }
+      date_published: { type: :date, format: "date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
+      provider_id: { type: :keyword }
     }
     indexes :obj,              type: :object, properties: {
       type: { type: :keyword },
@@ -94,15 +94,15 @@ class Event < ActiveRecord::Base
       name: { type: :text },
       author: { type: :object },
       periodical: { type: :text },
-      "alternate-name" => { type: :text },
-      "volume-number" => { type: :keyword },
-      "issue-number" => { type: :keyword },
+      alternate_name: { type: :text },
+      volume_number: { type: :keyword },
+      issue_number: { type: :keyword },
       pagination: { type: :keyword },
       publisher: { type: :keyword },
       version: { type: :keyword },
       issn: { type: :keyword },
-      "date-published" => { type: :date, format: "date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
-      "provider-id" => { type: :keyword }
+      date_published: { type: :date, format: "date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
+      provider_id: { type: :keyword }
     }
     indexes :source_id,        type: :keyword
     indexes :source_token,     type: :keyword
@@ -209,7 +209,7 @@ class Event < ActiveRecord::Base
   end
 
   def provider_id
-    [subj["provider-id"], obj["provider-id"]].compact
+    [subj["provider_id"], obj["provider_id"]].compact
   end
 
   def type
