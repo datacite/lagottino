@@ -6,6 +6,7 @@ class EventsController < ApplicationController
 
   prepend_before_action :authenticate_user_from_token!, :except => [:index, :show]
   before_action :load_event, only: [:show, :destroy]
+  before_action :set_include, only: [:index, :show, :create, :update]
   authorize_resource only: [:destroy]
 
   def create
@@ -69,6 +70,8 @@ class EventsController < ApplicationController
            when "-total" then { "total" => { order: 'desc' }}
            when "created" then { created_at: { order: 'asc' }}
            when "-created" then { created_at: { order: 'desc' }}
+           when "updated" then { updated_at: { order: 'asc' }}
+           when "-updated" then { updated_at: { order: 'desc' }}
            else { updated_at: { order: 'asc' }}
            end
 
@@ -153,10 +156,19 @@ class EventsController < ApplicationController
     fail ActiveRecord::RecordNotFound unless @event.present?
   end
 
+  def set_include
+    if params[:include].present?
+      @include = params[:include].split(",").map { |i| i.downcase.underscore.to_sym }
+      @include = @include & [:subj, :obj]
+    else
+      @include = []
+    end
+  end
+
   private
 
   def safe_params
-    nested_params = [:pid, :name, { author: [:given, :family, :literal, :orcid] }, :title, "container-title", :issued, :published, :url, :doi, :type]
+    nested_params = [:id, :name, { author: ["given-name", "family-name", :name] }, "alternate-name", :publisher, :periodical, "volume-number", "issue-number", :pagination, :issn, "date-published", "provider-id", :doi, :url, :type]
     ActiveModelSerializers::Deserialization.jsonapi_parse!(
       params, only: [:uuid, "message-action", "source-token", :callback, "subj-id", "obj-id", "relation-type-id", "source-id", :total, :license, "occurred-at", :subj, :obj, subj: nested_params, obj: nested_params]        
     )
