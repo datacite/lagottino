@@ -23,12 +23,13 @@ describe "/events", :type => :request do
                       "license"=>"https://creativecommons.org/publicdomain/zero/1.0/",
                       "occurred-at"=>"2015-04-08T00:00:00.000Z",
                       "subj"=> {"id"=>"http://www.citeulike.org/user/dbogartoit",
-                               "author"=>[{"given"=>"dbogartoit"}],
-                               "name"=>"CiteULike bookmarks for user dbogartoit",
-                               "publisher"=>"CiteULike",
-                               "date-published"=>"2006-06-13T16:14:19Z",
-                               "url"=>"http://www.citeulike.org/user/dbogartoit",
-                               "type"=>"entry"
+                                "uid"=>"http://www.citeulike.org/user/dbogartoit",
+                                "author"=>[{"given"=>"dbogartoit"}],
+                                "name"=>"CiteULike bookmarks for user dbogartoit",
+                                "publisher"=>"CiteULike",
+                                "date-published"=>"2006-06-13T16:14:19Z",
+                                "url"=>"http://www.citeulike.org/user/dbogartoit",
+                                "type"=>"entry"
                       },
                       "obj"=>{}
                     }}}
