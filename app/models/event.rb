@@ -73,6 +73,7 @@ class Event < ActiveRecord::Base
     indexes :subj,             type: :object, properties: {
       type: { type: :keyword },
       id: { type: :keyword },
+      uid: { type: :keyword },
       name: { type: :text },
       author: { type: :object },
       periodical: { type: :text },
@@ -89,6 +90,7 @@ class Event < ActiveRecord::Base
     indexes :obj,              type: :object, properties: {
       type: { type: :keyword },
       id: { type: :keyword },
+      uid: { type: :keyword },
       name: { type: :text },
       author: { type: :object },
       periodical: { type: :text },
@@ -128,8 +130,8 @@ class Event < ActiveRecord::Base
       "uuid" => uuid,
       "subj_id" => subj_id,
       "obj_id" => obj_id,
-      "subj" => subj,
-      "obj" => obj,
+      "subj" => subj.merge("uid" => subj_id),
+      "obj" => obj.merge("uid" => obj_id),
       "doi" => doi,
       "prefix" => prefix,
       "type" => type,
