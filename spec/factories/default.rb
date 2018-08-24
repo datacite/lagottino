@@ -6,6 +6,7 @@ FactoryBot.define do
     subj_id "http://www.citeulike.org/user/dbogartoit"
     obj_id "http://doi.org/10.1371/journal.pmed.0030186"
     subj {{ "id"=>"http://www.citeulike.org/user/dbogartoit",
+            "uid"=>"http://www.citeulike.org/user/dbogartoit",
             "author"=>[{ "given"=>"dbogartoit" }],
             "name"=>"CiteULike bookmarks for user dbogartoit",
             "publisher"=>"CiteULike",
