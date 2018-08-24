@@ -80,12 +80,15 @@ module Indexable
       must << { multi_match: { query: query, fields: query_fields, type: "phrase_prefix", max_expansions: 50 }} if query.present?
       must << { term: { subj_id: options[:subj_id] }} if options[:subj_id].present?
       must << { term: { obj_id: options[:obj_id] }} if options[:obj_id].present?
-      must << { term: { doi: options[:doi].downcase }} if options[:doi].present?
+      must << { term: { citation_type: options[:citation_type] }} if options[:citation_type].present?
       must << { term: { year_month: options[:year_month] }} if options[:year_month].present?
       must << { range: { occurred_at: { gte: "#{options[:occurred_at].split(",").min}||/y", lte: "#{options[:occurred_at].split(",").max}||/y", format: "yyyy" }}} if options[:occurred_at].present?
       must << { terms: { prefix: options[:prefix].split(",") }} if options[:prefix].present?
+      must << { terms: { doi: options[:doi].downcase.split(",") }} if options[:doi].present?
+      must << { terms: { type: options[:type].split(",") }} if options[:type].present?
       must << { terms: { source_id: options[:source_id].split(",") }} if options[:source_id].present?
       must << { terms: { relation_type_id: options[:relation_type_id].split(",") }} if options[:relation_type_id].present?
+      must << { terms: { provider_id: options[:provider_id].split(",") }} if options[:provider_id].present?
       
       must_not = []
 

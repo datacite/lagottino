@@ -68,12 +68,45 @@ class Event < ActiveRecord::Base
     indexes :obj_id,           type: :keyword
     indexes :doi,              type: :keyword
     indexes :prefix,           type: :keyword
-    indexes :subj,             type: :object
-    indexes :obj,              type: :object
+    indexes :type,             type: :keyword
+    indexes :citation_type,    type: :keyword
+    indexes :subj,             type: :object, properties: {
+      type: { type: :keyword },
+      id: { type: :keyword },
+      name: { type: :text },
+      author: { type: :object },
+      periodical: { type: :text },
+      "alternate-name" => { type: :text },
+      "volume-number" => { type: :keyword },
+      "issue-number" => { type: :keyword },
+      pagination: { type: :keyword },
+      publisher: { type: :keyword },
+      version: { type: :keyword },
+      issn: { type: :keyword },
+      "date-published" => { type: :date, format: "yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
+      "provider-id" => { type: :keyword }
+    }
+    indexes :obj,              type: :object, properties: {
+      type: { type: :keyword },
+      id: { type: :keyword },
+      name: { type: :text },
+      author: { type: :object },
+      periodical: { type: :text },
+      "alternate-name" => { type: :text },
+      "volume-number" => { type: :keyword },
+      "issue-number" => { type: :keyword },
+      pagination: { type: :keyword },
+      publisher: { type: :keyword },
+      version: { type: :keyword },
+      issn: { type: :keyword },
+      "date-published" => { type: :date, format: "date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
+      "provider-id" => { type: :keyword }
+    }
     indexes :source_id,        type: :keyword
     indexes :source_token,     type: :keyword
     indexes :message_action,   type: :keyword
     indexes :relation_type_id, type: :keyword
+    indexes :provider_id,      type: :keyword
     indexes :access_method,    type: :keyword
     indexes :metric_type,      type: :keyword
     indexes :total,            type: :integer
@@ -87,6 +120,7 @@ class Event < ActiveRecord::Base
     indexes :updated_at,       type: :date
     indexes :indexed_at,       type: :date
     indexes :occurred_at,      type: :date
+    indexes :cache_key,        type: :keyword
   end
 
   def as_indexed_json(options={})
@@ -98,10 +132,13 @@ class Event < ActiveRecord::Base
       "obj" => obj,
       "doi" => doi,
       "prefix" => prefix,
+      "type" => type,
+      "citation_type" => citation_type,
       "source_id" => source_id,
       "source_token" => source_token,
       "message_action" => message_action,
       "relation_type_id" => relation_type_id,
+      "provider_id" => provider_id,
       "access_method" => access_method,
       "metric_type" => metric_type,
       "total" => total,
@@ -113,7 +150,8 @@ class Event < ActiveRecord::Base
       "created_at" => created_at,
       "updated_at" => updated_at,
       "indexed_at" => indexed_at,
-      "occurred_at" => occurred_at
+      "occurred_at" => occurred_at,
+      "cache_key" => cache_key
     }
   end
 
@@ -167,6 +205,18 @@ class Event < ActiveRecord::Base
     [doi.map { |d| d.to_s.split('/', 2).first }].compact
   end
 
+  def provider_id
+    [subj["provider-id"], obj["provider-id"]].compact
+  end
+
+  def type
+    [subj["type"], obj["type"]].compact
+  end
+
+  def citation_type
+    [subj["type"], obj["type"]].compact.sort.join("-")
+  end
+
   def doi_from_url(url)
     if /\A(?:(http|https):\/\/(dx\.)?(doi.org|handle.test.datacite.org)\/)?(doi:)?(10\.\d{4,5}\/.+)\z/.match(url)
       uri = Addressable::URI.parse(url)
@@ -183,7 +233,8 @@ class Event < ActiveRecord::Base
   end
 
   def cache_key
-    "events/#{uuid}-#{timestamp}"
+    timestamp = updated_at || Time.zone.now
+    "events/#{uuid}-#{timestamp.iso8601}"
   end
 
   def set_defaults

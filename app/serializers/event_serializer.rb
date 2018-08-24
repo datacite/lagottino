@@ -5,7 +5,10 @@ class EventSerializer
   set_id :uuid
   cache_options enabled: true, cache_length: 24.hours
   
-  attributes :subj_id, :obj_id, :message_action, :source_token, :relation_type_id, :source_id, :total, :license, :occurred_at, :timestamp, :subj, :obj
+  attributes :message_action, :source_token, :relation_type_id, :source_id, :total, :license, :occurred_at, :timestamp
   
+  belongs_to :subj, serializer: ObjectSerializer, if: Proc.new { |record| record.subj.present? }
+  belongs_to :obj, serializer: ObjectSerializer, if: Proc.new { |record| record.obj.present? }
+
   attribute :timestamp, &:updated_at
 end
