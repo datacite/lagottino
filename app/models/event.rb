@@ -214,7 +214,12 @@ class Event < ActiveRecord::Base
   end
 
   def citation_type
-    [subj["type"], obj["type"]].compact.sort.join("-")
+    ct = [subj["type"], obj["type"]].compact.sort
+    if ct.present?
+      ct.join("-")
+    else
+      nil
+    end
   end
 
   def doi_from_url(url)
