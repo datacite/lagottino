@@ -100,6 +100,7 @@ class EventsController < ApplicationController
                              source_id: params[:source_id], 
                              provider_id: params[:provider_id],
                              relation_type_id: params[:relation_type_id],
+                             issn: params[:issn],
                              year_month: params[:year_month], 
                              page: page,
                              sort: sort)
@@ -136,6 +137,7 @@ class EventsController < ApplicationController
         "citation_type" => params[:citation_type],
         "source-id" => params[:source_id],
         "relation-type-id" => params[:relation_type_id],
+        "issn" => params[:issn],
         "provider-id" => params[:provider_id],
         "year-month" => params[:year_month],
         "page[cursor]" => @events.last[:sort].first,
