@@ -70,6 +70,7 @@ class Event < ActiveRecord::Base
     indexes :prefix,           type: :keyword
     indexes :type,             type: :keyword
     indexes :citation_type,    type: :keyword
+    indexes :issn,             type: :keyword
     indexes :subj,             type: :object, properties: {
       type: { type: :keyword },
       id: { type: :keyword },
@@ -130,12 +131,13 @@ class Event < ActiveRecord::Base
       "uuid" => uuid,
       "subj_id" => subj_id,
       "obj_id" => obj_id,
-      "subj" => subj,
-      "obj" => obj,
+      "subj" => subj.compact,
+      "obj" => obj.compact,
       "doi" => doi,
       "prefix" => prefix,
       "type" => type,
       "citation_type" => citation_type,
+      "issn" => issn,
       "source_id" => source_id,
       "source_token" => source_token,
       "message_action" => message_action,
@@ -219,7 +221,6 @@ class Event < ActiveRecord::Base
                "timestamp" => timestamp }}
     Maremma.post(callback, data: data.to_json, token: ENV['API_KEY'])
   end
-
   def access_method
     if relation_type_id.to_s =~ /(requests|investigations)/
       relation_type_id.split("-").last if relation_type_id.present?
@@ -239,6 +240,10 @@ class Event < ActiveRecord::Base
 
   def prefix
     [doi.map { |d| d.to_s.split('/', 2).first }].compact
+  end
+
+  def issn
+    (Array.wrap(subj["issn"]) + Array.wrap(obj["issn"])).compact
   end
 
   def provider_id
