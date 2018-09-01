@@ -24,7 +24,7 @@ module Indexable
       __elasticsearch__.search({
         query: {
           term: {
-            obj_id: id.upcase
+            uuid: id
           }
         },
         aggregations: query_aggregations
