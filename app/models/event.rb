@@ -86,7 +86,8 @@ class Event < ActiveRecord::Base
       version: { type: :keyword },
       issn: { type: :keyword },
       date_published: { type: :date, format: "date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
-      provider_id: { type: :keyword }
+      provider_id: { type: :keyword },
+      cache_key: { type: :keyword }
     }
     indexes :obj,              type: :object, properties: {
       type: { type: :keyword },
@@ -103,7 +104,8 @@ class Event < ActiveRecord::Base
       version: { type: :keyword },
       issn: { type: :keyword },
       date_published: { type: :date, format: "date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
-      provider_id: { type: :keyword }
+      provider_id: { type: :keyword },
+      cache_key: { type: :keyword }
     }
     indexes :source_id,        type: :keyword
     indexes :source_token,     type: :keyword
@@ -131,8 +133,8 @@ class Event < ActiveRecord::Base
       "uuid" => uuid,
       "subj_id" => subj_id,
       "obj_id" => obj_id,
-      "subj" => subj.compact,
-      "obj" => obj.compact,
+      "subj" => subj.merge(cache_key: subj_cache_key),
+      "obj" => obj.merge(cache_key: obj_cache_key),
       "doi" => doi,
       "prefix" => prefix,
       "subtype" => subtype,
@@ -280,12 +282,25 @@ class Event < ActiveRecord::Base
     "events/#{uuid}-#{timestamp.iso8601}"
   end
 
+  def subj_cache_key
+    timestamp = subj["date_modified"] || Time.zone.now
+    "objects/#{subj_id}-#{timestamp.iso8601}"
+  end
+
+  def obj_cache_key
+    timestamp = obj["date_modified"] || Time.zone.now
+    "objects/#{obj_id}-#{timestamp.iso8601}"
+  end
+
   def set_defaults
     self.uuid = SecureRandom.uuid if uuid.blank?
     self.subj_id = normalize_doi(subj_id) || subj_id
     self.obj_id = normalize_doi(obj_id) || obj_id
-    self.subj = {} if subj.blank?
-    self.obj = {} if obj.blank?
+
+    # make sure subj and obj have correct id
+    self.subj = subj.to_h.merge("id" => self.subj_id)
+    self.obj = obj.to_h.merge("id" => self.obj_id)
+    
     self.total = 1 if total.blank?
     self.relation_type_id = "references" if relation_type_id.blank?
     self.occurred_at = Time.zone.now.utc if occurred_at.blank?
