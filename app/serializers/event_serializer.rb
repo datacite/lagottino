@@ -7,8 +7,8 @@ class EventSerializer
   
   attributes :source_id, :relation_type_id, :total, :message_action, :source_token, :license, :occurred_at, :timestamp
   
-  belongs_to :subj, serializer: ObjectSerializer, record_type: :objects #, if: Proc.new { |record| record.subj.respond_to?(:id) }
-  belongs_to :obj, serializer: ObjectSerializer, record_type: :objects #, if: Proc.new { |record| record.obj.respond_to?(:id) }
+  belongs_to :subj, serializer: ObjectSerializer, record_type: :objects
+  belongs_to :obj, serializer: ObjectSerializer, record_type: :objects
 
   attribute :timestamp, &:updated_at
 end
