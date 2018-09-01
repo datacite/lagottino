@@ -63,7 +63,7 @@ describe "/events", :type => :request do
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to be_nil
         expect(response.dig("data", "id")).not_to eq(event.uuid)
-        expect(response.dig("data", "relationships", "subj", "data")).to eq("id"=>"http://www.citeulike.org/user/dbogartoit", "type"=>"objects")
+        expect(response.dig("data", "relationships", "subj", "data")).to eq("id"=>event.subj_id, "type"=>"objects")
       end
     end
 
@@ -209,7 +209,7 @@ describe "/events", :type => :request do
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to be_nil
         expect(response.dig("data", "id")).to eq(event.uuid)
-        expect(response.dig("data", "relationships", "subj", "data")).to eq("id"=>"http://www.citeulike.org/user/dbogartoit", "type"=>"objects")
+        expect(response.dig("data", "relationships", "subj", "data")).to eq("id"=>event.subj_id, "type"=>"objects")
       end
     end
   end
@@ -238,7 +238,7 @@ describe "/events", :type => :request do
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to be_nil
         expect(response.dig("data", "id")).to eq(event.uuid)
-        expect(response.dig("data", "relationships", "subj", "data")).to eq("id"=>"http://www.citeulike.org/user/dbogartoit", "type"=>"objects")
+        expect(response.dig("data", "relationships", "subj", "data")).to eq("id"=>event.subj_id, "type"=>"objects")
       end
     end
 
@@ -384,7 +384,7 @@ describe "/events", :type => :request do
 
         response = JSON.parse(last_response.body)
         expect(response["errors"]).to be_nil
-        expect(response.dig("data", "relationships", "subj", "data")).to eq("id"=>"http://www.citeulike.org/user/dbogartoit", "type"=>"objects")
+        expect(response.dig("data", "relationships", "subj", "data")).to eq("id"=>event.subj_id, "type"=>"objects")
       end
     end
   end
