@@ -68,9 +68,9 @@ class Event < ActiveRecord::Base
     indexes :obj_id,           type: :keyword
     indexes :doi,              type: :keyword
     indexes :prefix,           type: :keyword
-    indexes :type,             type: :keyword
+    indexes :subtype,          type: :keyword
     indexes :citation_type,    type: :keyword
-    indexes :issn,             type: :keyword
+    #indexes :issn,             type: :keyword
     indexes :subj,             type: :object, properties: {
       type: { type: :keyword },
       id: { type: :keyword },
@@ -135,9 +135,9 @@ class Event < ActiveRecord::Base
       "obj" => obj.compact,
       "doi" => doi,
       "prefix" => prefix,
-      "type" => type,
+      "subtype" => subtype,
       "citation_type" => citation_type,
-      "issn" => issn,
+      #"issn" => issn,
       "source_id" => source_id,
       "source_token" => source_token,
       "message_action" => message_action,
@@ -250,7 +250,7 @@ class Event < ActiveRecord::Base
     [subj["provider_id"], obj["provider_id"]].compact
   end
 
-  def type
+  def subtype
     [subj["type"], obj["type"]].compact
   end
 
