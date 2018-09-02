@@ -11,7 +11,7 @@ class ObjectSerializer
   end
 
   attribute :author do |object|
-    object.author.map do |a|
+    Array.wrap(object.author).map do |a|
       a.present? ? a.transform_keys! { |key| key.tr('_', '-') } : nil
     end.compact
   end
