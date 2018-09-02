@@ -283,13 +283,13 @@ class Event < ActiveRecord::Base
   end
 
   def subj_cache_key
-    timestamp = subj["date_modified"] || Time.zone.now
-    "objects/#{subj_id}-#{timestamp.iso8601}"
+    timestamp = subj["date_modified"] || Time.zone.now.iso8601
+    "objects/#{subj_id}-#{timestamp}"
   end
 
   def obj_cache_key
-    timestamp = obj["date_modified"] || Time.zone.now
-    "objects/#{obj_id}-#{timestamp.iso8601}"
+    timestamp = obj["date_modified"] || Time.zone.now.iso8601
+    "objects/#{obj_id}-#{timestamp}"
   end
 
   def set_defaults
