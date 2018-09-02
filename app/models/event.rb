@@ -86,6 +86,7 @@ class Event < ActiveRecord::Base
       version: { type: :keyword },
       issn: { type: :keyword },
       date_published: { type: :date, format: "date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
+      date_modified: { type: :date, format: "date_optional_time", ignore_malformed: true },
       provider_id: { type: :keyword },
       cache_key: { type: :keyword }
     }
@@ -104,6 +105,7 @@ class Event < ActiveRecord::Base
       version: { type: :keyword },
       issn: { type: :keyword },
       date_published: { type: :date, format: "date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
+      date_modified: { type: :date, format: "date_optional_time", ignore_malformed: true },
       provider_id: { type: :keyword },
       cache_key: { type: :keyword }
     }
