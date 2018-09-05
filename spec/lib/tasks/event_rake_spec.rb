@@ -5,10 +5,10 @@ describe "event:index", elasticsearch: true do
   include_context "rake"
 
   ENV['FROM_DATE'] = "2018-01-04"
-  ENV['UNTIL_DATE'] = "2018-08-05"
+  ENV['UNTIL_DATE'] = "2018-08-03"
 
   let!(:event)  { create_list(:event, 10) }
-  let(:output) { "Queued indexing for events updated from 2018-01-01 until 2018-08-31.\n" }
+  let(:output) { "Queued indexing for events updated from 2018-01-04 until 2018-08-03.\n" }
 
   it "prerequisites should include environment" do
     expect(subject.prerequisites).to include("environment")
@@ -21,7 +21,7 @@ describe "event:index", elasticsearch: true do
   it "should enqueue an EventIndexByDayJob" do
     expect {
       capture_stdout { subject.invoke }
-    }.to change(enqueued_jobs, :size).by(243)
+    }.to change(enqueued_jobs, :size).by(212)
     expect(enqueued_jobs.last[:job]).to be(EventIndexByDayJob)
   end
 end

@@ -177,8 +177,8 @@ class Event < ActiveRecord::Base
   end
 
   def self.index(options={})
-    from_date = (options[:from_date].present? ? Date.parse(options[:from_date]) : Date.current).beginning_of_month
-    until_date = (options[:until_date].present? ? Date.parse(options[:until_date]) : Date.current).end_of_month
+    from_date = options[:from_date].present? ? Date.parse(options[:from_date]) : Date.current
+    until_date = options[:until_date].present? ? Date.parse(options[:until_date]) : Date.current
 
     # get first day of every month between from_date and until_date
     (from_date..until_date).each do |d|
@@ -190,13 +190,12 @@ class Event < ActiveRecord::Base
 
   def self.index_by_day(options={})
     from_date = options[:from_date].present? ? Date.parse(options[:from_date]) : Date.current
-    until_date = from_date + 1.day
     errors = 0
     count = 0
 
     logger = Logger.new(STDOUT)
 
-    Event.where("updated_at >= ?", from_date.strftime("%F") + " 00:00:00").where("updated_at <= ?", until_date.strftime("%F") + " 00:00:00").find_in_batches(batch_size: 1000) do |events|
+    Event.where("updated_at >= ?", from_date.strftime("%F") + " 00:00:00").where("updated_at < ?", (from_date + 1.day).strftime("%F") + " 00:00:00").find_in_batches(batch_size: 1000) do |events|
       response = Event.__elasticsearch__.client.bulk \
         index:   Event.index_name,
         type:    Event.document_type,
