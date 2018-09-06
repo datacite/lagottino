@@ -88,7 +88,8 @@ module Indexable
       must << { terms: { subtype: options[:subtype].split(",") }} if options[:subtype].present?
       must << { terms: { source_id: options[:source_id].split(",") }} if options[:source_id].present?
       must << { terms: { relation_type_id: options[:relation_type_id].split(",") }} if options[:relation_type_id].present?
-      must << { terms: { provider_id: options[:provider_id].split(",") }} if options[:provider_id].present?
+      must << { terms: { registrant_id: options[:registrant_id].split(",") }} if options[:registrant_id].present?
+      must << { terms: { registrant_id: options[:provider_id].split(",") }} if options[:provider_id].present?
       must << { terms: { issn: options[:issn].split(",") }} if options[:issn].present?
       
       must_not = []

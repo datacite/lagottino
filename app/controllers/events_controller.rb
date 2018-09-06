@@ -98,7 +98,7 @@ class EventsController < ApplicationController
                              subtype: params[:subtype],
                              citation_type: params[:citation_type],
                              source_id: params[:source_id], 
-                             provider_id: params[:provider_id],
+                             registrant_id: params[:registrant_id],
                              relation_type_id: params[:relation_type_id],
                              issn: params[:issn],
                              year_month: params[:year_month], 
@@ -110,6 +110,8 @@ class EventsController < ApplicationController
     total_pages = page[:size] > 0 ? (total.to_f / page[:size]).ceil : 0
     sources = total > 0 ? facet_by_source(response.response.aggregations.sources.buckets) : nil
     prefixes = total > 0 ? facet_by_source(response.response.aggregations.prefixes.buckets) : nil
+    publication_years = total > 0 ? facet_by_year(response.response.aggregations.publication_years.buckets) : nil
+    # registrants = total > 0 ? facet_by_registrant(response.response.aggregations.registrants.buckets) : nil
     citation_types = total > 0 ? facet_by_citation_type(response.response.aggregations.citation_types.buckets) : nil
     relation_types = total > 0 ? facet_by_relation_type(response.response.aggregations.relation_types.buckets) : nil
 
@@ -121,6 +123,7 @@ class EventsController < ApplicationController
       "total-pages" => total_pages,
       sources: sources,
       prefixes: prefixes,
+      "publication-years" => publication_years,
       "citation-types" => citation_types,
       "relation-types" => relation_types
     }.compact
@@ -138,7 +141,7 @@ class EventsController < ApplicationController
         "source-id" => params[:source_id],
         "relation-type-id" => params[:relation_type_id],
         "issn" => params[:issn],
-        "provider-id" => params[:provider_id],
+        "registrant-id" => params[:registrant_id],
         "year-month" => params[:year_month],
         "page[cursor]" => @events.last[:sort].first,
         "page[size]" => params.dig(:page, :size) }.compact.to_query
@@ -178,7 +181,7 @@ class EventsController < ApplicationController
   private
 
   def safe_params
-    nested_params = [:id, :name, { author: ["given-name", "family-name", :name] }, "alternate-name", :publisher, :periodical, "volume-number", "issue-number", :pagination, :issn, "date-published", "provider-id", :doi, :url, :type]
+    nested_params = [:id, :name, { author: ["given-name", "family-name", :name] }, "alternate-name", :publisher, :periodical, "volume-number", "issue-number", :pagination, :issn, "date-published", "registrant-id", :doi, :url, :type]
     ActiveModelSerializers::Deserialization.jsonapi_parse!(
       params, only: [:uuid, "message-action", "source-token", :callback, "subj-id", "obj-id", "relation-type-id", "source-id", :total, :license, "occurred-at", :subj, :obj, subj: nested_params, obj: nested_params]        
     )

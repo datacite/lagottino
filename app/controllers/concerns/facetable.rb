@@ -92,6 +92,19 @@ module Facetable
       end
     end
 
+    def facet_by_registrant(arr)
+      # generate hash with id and name for each registrant in facet
+      # crossref_ids = arr.select { |hsh| hsh["key"].start_with?("crossref") }.map { |hsh| hsh["key"] }.join(",")
+      datacite_ids = arr.select { |hsh| hsh["key"].start_with?("datacite") }.map { |hsh| hsh["key"] }.join(",")
+      registrants = Client.find_by_ids(datacite_ids)
+
+      arr.map do |hsh|
+        { "id" => hsh["key"],
+          "title" => registrants[hsh["key"]],
+          "count" => hsh["doc_count"] }
+      end
+    end
+
     def facet_by_key(arr)
       arr.map do |hsh|
         { "id" => hsh["key"],
