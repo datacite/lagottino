@@ -220,7 +220,6 @@ describe "/events", :type => :request do
       { "data" => { "type" => "events",
                     "id" => event.uuid,
                     "attributes" => {
-                      "uuid" => event.uuid,
                       "subj-id" => event.subj_id,
                       "subj" => event.subj,
                       "obj-id" => event.obj_id,
@@ -271,9 +270,8 @@ describe "/events", :type => :request do
     context "without source-token" do
       let(:params) do
         { "data" => { "type" => "events",
-            
+                      "id" => uuid,
                       "attributes" => {
-                        "uuid" => uuid,
                         "subj-id" => event.subj_id,
                         "source-id" => event.source_id } } }
       end
@@ -291,8 +289,8 @@ describe "/events", :type => :request do
     context "without source-id" do
       let(:params) do
         { "data" => { "type" => "events",
+                      "id" => uuid,
                       "attributes" => {
-                        "uuid" => uuid,
                         "subj-id" => event.subj_id,
                         "source-token" => event.source_token } } }
       end
@@ -310,8 +308,8 @@ describe "/events", :type => :request do
     context "without subj-id" do
       let(:params) do
         { "data" => { "type" => "events",
+                      "id" => uuid,
                       "attributes" => {
-                        "uuid" => uuid,
                         "source-id" => event.source_id,
                         "source-token" => event.source_token } } }
       end
@@ -345,9 +343,9 @@ describe "/events", :type => :request do
     context "with missing data param" do
       let(:params) do
         { "event" => { "type" => "events",
-                         "attributes" => {
-                           "uuid" => uuid,
-                           "source-token" => "123" } } }
+                       "id" => uuid,
+                       "attributes" => {
+                         "source-token" => "123" } } }
       end
 
       it "JSON" do

@@ -164,7 +164,7 @@ class Event < ActiveRecord::Base
   end
 
   def self.query_fields
-    ['subj_id^10', 'obj_id^10', '_all']
+    ['subj_id^10', 'obj_id^10', 'subj.name^5', 'subj.author^5', 'subj.periodical^5', 'subj.publisher^5', 'obj.name^5', 'obj.author^5', 'obj.periodical^5', 'obj.publisher^5', '_all']
   end
 
   def self.query_aggregations
