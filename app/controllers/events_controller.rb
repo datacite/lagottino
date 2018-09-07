@@ -111,8 +111,6 @@ class EventsController < ApplicationController
     total_pages = page[:size] > 0 ? (total.to_f / page[:size]).ceil : 0
     sources = total > 0 ? facet_by_source(response.response.aggregations.sources.buckets) : nil
     prefixes = total > 0 ? facet_by_source(response.response.aggregations.prefixes.buckets) : nil
-    publication_years = total > 0 ? facet_by_year(response.response.aggregations.publication_years.buckets) : nil
-    # registrants = total > 0 ? facet_by_registrant(response.response.aggregations.registrants.buckets) : nil
     citation_types = total > 0 ? facet_by_citation_type(response.response.aggregations.citation_types.buckets) : nil
     relation_types = total > 0 ? facet_by_relation_type(response.response.aggregations.relation_types.buckets) : nil
 
@@ -124,7 +122,6 @@ class EventsController < ApplicationController
       "total-pages" => total_pages,
       sources: sources,
       prefixes: prefixes,
-      "publication-years" => publication_years,
       "citation-types" => citation_types,
       "relation-types" => relation_types
     }.compact
