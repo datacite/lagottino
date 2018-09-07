@@ -82,7 +82,8 @@ module Indexable
       must << { term: { obj_id: options[:obj_id] }} if options[:obj_id].present?
       must << { term: { citation_type: options[:citation_type] }} if options[:citation_type].present?
       must << { term: { year_month: options[:year_month] }} if options[:year_month].present?
-      must << { range: { occurred_at: { gte: "#{options[:occurred_at].split(",").min}||/y", lte: "#{options[:occurred_at].split(",").max}||/y", format: "yyyy" }}} if options[:occurred_at].present?
+      must << { range: { "subj.date_published" => { gte: "#{options[:publication_year].split("-").min}||/y", lte: "#{options[:publication_year].split("-").max}||/y", format: "yyyy" }}} if options[:publication_year].present?
+      must << { range: { occurred_at: { gte: "#{options[:occurred_at].split("-").min}||/y", lte: "#{options[:occurred_at].split("-").max}||/y", format: "yyyy" }}} if options[:occurred_at].present?
       must << { terms: { prefix: options[:prefix].split(",") }} if options[:prefix].present?
       must << { terms: { doi: options[:doi].downcase.split(",") }} if options[:doi].present?
       must << { terms: { subtype: options[:subtype].split(",") }} if options[:subtype].present?

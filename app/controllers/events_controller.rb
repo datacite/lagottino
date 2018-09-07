@@ -101,6 +101,7 @@ class EventsController < ApplicationController
                              registrant_id: params[:registrant_id],
                              relation_type_id: params[:relation_type_id],
                              issn: params[:issn],
+                             publication_year: params[:publication_year], 
                              year_month: params[:year_month], 
                              page: page,
                              sort: sort)
@@ -142,6 +143,7 @@ class EventsController < ApplicationController
         "relation-type-id" => params[:relation_type_id],
         "issn" => params[:issn],
         "registrant-id" => params[:registrant_id],
+        "publication-year" => params[:publication_year],
         "year-month" => params[:year_month],
         "page[cursor]" => @events.last[:sort].first,
         "page[size]" => params.dig(:page, :size) }.compact.to_query
