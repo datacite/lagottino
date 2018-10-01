@@ -92,7 +92,7 @@ module Facetable
       end
     end
 
-    def facet_by_clients(arr)
+    def facet_by_registrants(arr)
       arr.map do |hsh|
         arr = hsh.dig("year_months", "buckets").map do |h|
           month = h["key_as_string"][5..6].to_i
