@@ -94,20 +94,19 @@ module Facetable
 
     def facet_by_registrants(arr)
       arr.map do |hsh|
-        arr = hsh.dig("year_months", "buckets").map do |h|
-          month = h["key_as_string"][5..6].to_i
-          title = I18n.t("date.month_names")[month] + " " + h["key_as_string"][0..3]
+        arr = hsh.dig("year", "buckets").map do |h|
+          title = h["key_as_string"][0..3]
 
           {
-            "id" => h["key_as_string"][0..6],
+            "id" => h["key_as_string"][0..3],
             "title" => title,
-            "sum" => h.dig("total_by_year_month", "value") }
+            "sum" => h.dig("total_by_year", "value") }
         end
 
         { "id" => hsh["key"],
           "title" => hsh["key"],
           "count" => hsh["doc_count"],
-          "year-months" => arr }
+          "years" => arr }
       end
     end
 
