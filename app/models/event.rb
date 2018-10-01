@@ -171,8 +171,8 @@ class Event < ActiveRecord::Base
     {
       sources: { terms: { field: 'source_id', size: 50, min_doc_count: 1 } },
       prefixes: { terms: { field: 'prefix', size: 50, min_doc_count: 1 } },
-      pairings: { terms: { field: 'subj.provider_id', size: 50, min_doc_count: 1 }, aggs: { citation_types: { terms: { field: 'obj.provider_id', size: 50, min_doc_count: 1 }, aggs: { "tota" => { sum: { field: 'total' }}}}} },
-      clients: { terms: { field: 'subj.provider_id', size: 50, min_doc_count: 1 }, aggs: { year_months: { date_histogram: { field: 'occurred_at', interval: 'month', min_doc_count: 1 }, aggs: { "total_by_year_month" => { sum: { field: 'total' }}}}} },
+      clients: { terms: { field: 'registrant_id', size: 50, min_doc_count: 1 }, aggs: { year_months: { date_histogram: { field: 'occurred_at', interval: 'month', min_doc_count: 1 }, aggs: { "total_by_year_month" => { sum: { field: 'total' }}}}} },
+      pairings: { terms: { field: 'registrant_id', size: 50, min_doc_count: 1 }},
       citation_types: { terms: { field: 'citation_type', size: 50, min_doc_count: 1 }, aggs: { year_months: { date_histogram: { field: 'occurred_at', interval: 'month', min_doc_count: 1 }, aggs: { "total_by_year_month" => { sum: { field: 'total' }}}}} },
       relation_types: { terms: { field: 'relation_type_id', size: 50, min_doc_count: 1 }, aggs: { year_months: { date_histogram: { field: 'occurred_at', interval: 'month', min_doc_count: 1 }, aggs: { "total_by_year_month" => { sum: { field: 'total' }}}}} }
     }
@@ -252,7 +252,7 @@ class Event < ActiveRecord::Base
   end
 
   def registrant_id
-    [subj["provider_id"], obj["provider_id"]].compact
+    [subj["publisher"], obj["publisher"]].compact
   end
 
   def subtype
