@@ -112,6 +112,8 @@ class EventsController < ApplicationController
     sources = total > 0 ? facet_by_source(response.response.aggregations.sources.buckets) : nil
     prefixes = total > 0 ? facet_by_source(response.response.aggregations.prefixes.buckets) : nil
     citation_types = total > 0 ? facet_by_citation_type(response.response.aggregations.citation_types.buckets) : nil
+    pairings = total > 0 ? facet_by_pairings(response.response.aggregations.pairings.buckets) : nil
+    clients = total > 0 ? facet_by_clients(response.response.aggregations.clients.buckets) : nil
     relation_types = total > 0 ? facet_by_relation_type(response.response.aggregations.relation_types.buckets) : nil
 
     @events = response.results.results
@@ -123,7 +125,9 @@ class EventsController < ApplicationController
       sources: sources,
       prefixes: prefixes,
       "citation-types" => citation_types,
-      "relation-types" => relation_types
+      "relation-types" => relation_types,
+      pairings: pairings,
+      clients: clients
     }.compact
 
     options[:links] = {
