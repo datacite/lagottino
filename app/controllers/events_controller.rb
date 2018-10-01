@@ -184,7 +184,7 @@ class EventsController < ApplicationController
   private
 
   def safe_params
-    nested_params = [:id, :name, { author: ["given-name", "family-name", :name] }, "alternate-name", :publisher, :periodical, "volume-number", "issue-number", :pagination, :issn, "date-published", "registrant-id", :doi, :url, :type]
+    nested_params = [:id, :name, { author: ["given-name", "family-name", :name] }, "alternate-name", :publisher, "provider-id", :periodical, "volume-number", "issue-number", :pagination, :issn, "date-published", "registrant-id", :doi, :url, :type]
     ActiveModelSerializers::Deserialization.jsonapi_parse!(
       params, only: [:id, "message-action", "source-token", :callback, "subj-id", "obj-id", "relation-type-id", "source-id", :total, :license, "occurred-at", :subj, :obj, subj: nested_params, obj: nested_params],
               keys: { id: :uuid }    
