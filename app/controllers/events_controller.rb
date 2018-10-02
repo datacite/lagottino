@@ -112,7 +112,9 @@ class EventsController < ApplicationController
     sources = total > 0 ? facet_by_source(response.response.aggregations.sources.buckets) : nil
     prefixes = total > 0 ? facet_by_source(response.response.aggregations.prefixes.buckets) : nil
     citation_types = total > 0 ? facet_by_citation_type(response.response.aggregations.citation_types.buckets) : nil
-    relation_types = total > 0 ? facet_by_relation_type(response.response.aggregations.relation_types.buckets) : nil
+    relation_types = total > 0 ? facet_by_relation_type(response.response.aggregations.relation_types.buckets) : nil  
+    registrants = total > 0  && params[:extra] ? facet_by_registrants(response.response.aggregations.registrants.buckets) : nil   
+    pairings = total > 0 && params[:extra] ? facet_by_pairings(response.response.aggregations.pairings.buckets) : nil
 
     @events = response.results.results
 
@@ -123,7 +125,9 @@ class EventsController < ApplicationController
       sources: sources,
       prefixes: prefixes,
       "citation-types" => citation_types,
-      "relation-types" => relation_types
+      "relation-types" => relation_types,
+      pairings: pairings,
+      registrants: registrants
     }.compact
 
     options[:links] = {
@@ -180,7 +184,7 @@ class EventsController < ApplicationController
   private
 
   def safe_params
-    nested_params = [:id, :name, { author: ["given-name", "family-name", :name] }, "alternate-name", :publisher, :periodical, "volume-number", "issue-number", :pagination, :issn, "date-published", "registrant-id", :doi, :url, :type]
+    nested_params = [:id, :name, { author: ["given-name", "family-name", :name] }, "alternate-name", :publisher, "provider-id", :periodical, "volume-number", "issue-number", :pagination, :issn, "date-published", "registrant-id", :doi, :url, :type]
     ActiveModelSerializers::Deserialization.jsonapi_parse!(
       params, only: [:id, "message-action", "source-token", :callback, "subj-id", "obj-id", "relation-type-id", "source-id", :total, :license, "occurred-at", :subj, :obj, subj: nested_params, obj: nested_params],
               keys: { id: :uuid }    

@@ -84,6 +84,32 @@ module Facetable
       end
     end
 
+    def facet_by_pairings(arr)
+      arr.map do |hsh|
+        { "id" => hsh["key"],
+          "title" => SOURCES[hsh["key"]] || hsh["key"],
+          "count" => hsh["doc_count"] }
+      end
+    end
+
+    def facet_by_registrants(arr)
+      arr.map do |hsh|
+        arr = hsh.dig("year", "buckets").map do |h|
+          title = h["key_as_string"][0..3]
+
+          {
+            "id" => h["key_as_string"][0..3],
+            "title" => title,
+            "sum" => h.dig("total_by_year", "value") }
+        end
+
+        { "id" => hsh["key"],
+          "title" => hsh["key"],
+          "count" => hsh["doc_count"],
+          "years" => arr }
+      end
+    end
+
     def facet_by_metric_type(arr)
       arr.map do |hsh|
         { "id" => hsh["key"],
