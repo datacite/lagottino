@@ -86,9 +86,18 @@ module Facetable
 
     def facet_by_pairings(arr)
       arr.map do |hsh|
+        arr = hsh.dig("recipient", "buckets").map do |h|
+          title = h["key"]
+          {
+            "id" => h["key"],
+            "title" => title,
+            "sum" => h.dig("total", "value") }
+        end
+        arr.reject! {|h| h["id"] == hsh["key"]}
         { "id" => hsh["key"],
-          "title" => SOURCES[hsh["key"]] || hsh["key"],
-          "count" => hsh["doc_count"] }
+          "title" => hsh["key"],
+          "count" => hsh["doc_count"],
+          "registrants" => arr }
       end
     end
 
