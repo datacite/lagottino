@@ -5,6 +5,7 @@ module Indexable
     after_commit on: [:create, :update] do
       # use index_document instead of update_document to also update virtual attributes
       IndexJob.perform_later(self)
+      update_column(:indexed_at, Time.zone.now)  
     end
   
     before_destroy do

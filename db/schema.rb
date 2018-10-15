@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_07_134519) do
+ActiveRecord::Schema.define(version: 2018_10_15_230227) do
 
   create_table "events", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.text "uuid", null: false
@@ -32,6 +32,7 @@ ActiveRecord::Schema.define(version: 2018_09_07_134519) do
     t.text "obj"
     t.integer "total", default: 1
     t.string "license", limit: 191
+    t.index ["created_at", "indexed_at", "updated_at"], name: "index_events_on_created_indexed_updated"
     t.index ["source_id", "created_at"], name: "index_events_on_source_id_created_at"
     t.index ["subj_id", "obj_id", "source_id", "relation_type_id"], name: "index_events_on_multiple_columns", unique: true
     t.index ["updated_at"], name: "index_events_on_updated_at"

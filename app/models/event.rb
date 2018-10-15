@@ -187,7 +187,7 @@ class Event < ActiveRecord::Base
       EventIndexByDayJob.perform_later(from_date: d.strftime("%F"))
     end
 
-    "Queued indexing for events updated from #{from_date.strftime("%F")} until #{until_date.strftime("%F")}."
+    "Queued indexing for events created from #{from_date.strftime("%F")} until #{until_date.strftime("%F")}."
   end
 
   def self.index_by_day(options={})
@@ -197,7 +197,7 @@ class Event < ActiveRecord::Base
 
     logger = Logger.new(STDOUT)
 
-    Event.where("updated_at >= ?", from_date.strftime("%F") + " 00:00:00").where("updated_at < ?", (from_date + 1.day).strftime("%F") + " 00:00:00").find_in_batches(batch_size: 1000) do |events|
+    Event.where("created_at >= ?", from_date.strftime("%F") + " 00:00:00").where("created_at < ?", (from_date + 1.day).strftime("%F") + " 00:00:00").where("updated_at > indexed_at").find_in_batches(batch_size: 1000) do |events|
       response = Event.__elasticsearch__.client.bulk \
         index:   Event.index_name,
         type:    Event.document_type,
@@ -205,9 +205,10 @@ class Event < ActiveRecord::Base
 
       errors += response['items'].map { |k, v| k.values.first['error'] }.compact.length
       count += events.length
+      events.each { |event| event.update_column(:indexed_at, Time.zone.now) }
     end
 
-    logger.info "[Elasticsearch] #{errors} errors indexing #{count} events updated on #{from_date.strftime("%F")}."
+    logger.info "[Elasticsearch] #{errors} errors indexing #{count} events created on #{from_date.strftime("%F")}."
   end
 
   def to_param  # overridden, use uuid instead of id

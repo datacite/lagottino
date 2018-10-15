@@ -4,24 +4,30 @@ module Importable
   included do
     # strong_parameters throws an error, using attributes hash
     def update_record(attributes)
+      logger = Logger.new(STDOUT)
+
       if update_attributes(attributes)
-        Rails.logger.debug self.class.name + " " + id + " updated."
+        logger.debug self.class.name + " " + id + " updated."
       else
-        Rails.logger.info self.class.name + " " + id + " not updated: " + errors.to_a.inspect
+        logger.info self.class.name + " " + id + " not updated: " + errors.to_a.inspect
       end
     end
 
     def delete_record
+      logger = Logger.new(STDOUT)
+
       if destroy(refresh: true)
-        Rails.logger.debug self.class.name + " record deleted."
+        logger.debug self.class.name + " record deleted."
       else
-        Rails.logger.info self.class.name + " record not deleted: " + errors.to_a.inspect
+        logger.info self.class.name + " record not deleted: " + errors.to_a.inspect
       end
     end
   end
 
   module ClassMethods
     def import_from_api
+      logger = Logger.new(STDOUT)
+
       route = self.name.downcase + "s"
       page_number = 1
       total_pages = 1
@@ -33,7 +39,7 @@ module Importable
         url = ENV['APP_URL'] + "/#{route}?" + URI.encode_www_form(params)
 
         response = Maremma.get(url, content_type: 'application/vnd.api+json')
-        Rails.logger.warn response.body["errors"].inspect if response.body.fetch("errors", nil).present?
+        logger.warn response.body["errors"].inspect if response.body.fetch("errors", nil).present?
 
         records = response.body.fetch("data", [])
         records.each do |data|
@@ -46,7 +52,7 @@ module Importable
         end
 
         processed = (page_number - 1) * 100 + records.size
-        Rails.logger.info "#{processed} " + self.name.downcase + "s processed."
+        logger.info "#{processed} " + self.name.downcase + "s processed."
 
         page_number = response.body.dig("meta", "page").to_i + 1
         total = response.body.dig("meta", "total") || total
@@ -69,13 +75,15 @@ module Importable
     end
 
     def create_record(attributes)
+      logger = Logger.new(STDOUT)
+
       parameters = ActionController::Parameters.new(attributes)
       record = self.new(parameters.permit(self.safe_params))
 
       if record.save
-        Rails.logger.debug self.name + " " + record.id + " created."
+        logger.debug self.name + " " + record.id + " created."
       else
-        Rails.logger.info self.name + " " + record.id + " not created: " + record.errors.to_a.inspect
+        logger.info self.name + " " + record.id + " not created: " + record.errors.to_a.inspect
       end
 
       record

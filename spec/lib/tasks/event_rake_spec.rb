@@ -8,7 +8,7 @@ describe "event:index", elasticsearch: true do
   ENV['UNTIL_DATE'] = "2018-08-03"
 
   let!(:event)  { create_list(:event, 10) }
-  let(:output) { "Queued indexing for events updated from 2018-01-04 until 2018-08-03.\n" }
+  let(:output) { "Queued indexing for events created from 2018-01-04 until 2018-08-03.\n" }
 
   it "prerequisites should include environment" do
     expect(subject.prerequisites).to include("environment")
@@ -31,7 +31,7 @@ describe "event:index_by_day", elasticsearch: true do
   include_context "rake"
 
   let!(:event)  { create_list(:event, 10) }
-  let(:output) { "Events updated on 2018-01-04 indexed.\n" }
+  let(:output) { "Events created on 2018-01-04 indexed.\n" }
 
   it "prerequisites should include environment" do
     expect(subject.prerequisites).to include("environment")
