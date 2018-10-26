@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_10_15_230227) do
+ActiveRecord::Schema.define(version: 2018_10_26_164009) do
 
   create_table "events", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.text "uuid", null: false
@@ -28,8 +28,8 @@ ActiveRecord::Schema.define(version: 2018_10_15_230227) do
     t.datetime "occurred_at"
     t.string "message_action", limit: 191, default: "create", null: false
     t.string "relation_type_id", limit: 191
-    t.text "subj"
-    t.text "obj"
+    t.text "subj", limit: 16777215
+    t.text "obj", limit: 16777215
     t.integer "total", default: 1
     t.string "license", limit: 191
     t.index ["created_at", "indexed_at", "updated_at"], name: "index_events_on_created_indexed_updated"
