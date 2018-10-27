@@ -87,6 +87,7 @@ module Indexable
       must << { range: { occurred_at: { gte: "#{options[:occurred_at].split("-").min}||/y", lte: "#{options[:occurred_at].split("-").max}||/y", format: "yyyy" }}} if options[:occurred_at].present?
       must << { terms: { prefix: options[:prefix].split(",") }} if options[:prefix].present?
       must << { terms: { doi: options[:doi].downcase.split(",") }} if options[:doi].present?
+      must << { terms: { orcid: options[:orcid].split(",") }} if options[:orcid].present?
       must << { terms: { subtype: options[:subtype].split(",") }} if options[:subtype].present?
       must << { terms: { source_id: options[:source_id].split(",") }} if options[:source_id].present?
       must << { terms: { relation_type_id: options[:relation_type_id].split(",") }} if options[:relation_type_id].present?

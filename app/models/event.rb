@@ -67,6 +67,7 @@ class Event < ActiveRecord::Base
     indexes :subj_id,          type: :keyword
     indexes :obj_id,           type: :keyword
     indexes :doi,              type: :keyword
+    indexes :orcid,            type: :keyword
     indexes :prefix,           type: :keyword
     indexes :subtype,          type: :keyword
     indexes :citation_type,    type: :keyword
@@ -248,6 +249,10 @@ class Event < ActiveRecord::Base
     [doi.map { |d| d.to_s.split('/', 2).first }].compact
   end
 
+  def orcid
+    [orcid_from_url(subj_id), orcid_from_url(obj_id)].compact
+  end
+
   def issn
     (Array.wrap(subj["issn"]) + Array.wrap(obj["issn"])).compact
   end
@@ -271,6 +276,10 @@ class Event < ActiveRecord::Base
       uri = Addressable::URI.parse(url)
       uri.path.gsub(/^\//, '').downcase
     end
+  end
+
+  def orcid_from_url(url)
+    Array(/\A(http|https):\/\/orcid\.org\/(.+)/.match(url)).last
   end
 
   def timestamp
