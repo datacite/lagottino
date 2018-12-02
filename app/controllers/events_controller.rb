@@ -122,11 +122,11 @@ class EventsController < ApplicationController
     options = {}
     options[:meta] = {
       total: total,
-      "total-pages" => total_pages,
+      "totalPages" => total_pages,
       sources: sources,
       prefixes: prefixes,
-      "citation-types" => citation_types,
-      "relation-types" => relation_types,
+      "citationTypes" => citation_types,
+      "relationTypes" => relation_types,
       pairings: pairings,
       registrants: registrants
     }.compact
@@ -186,9 +186,9 @@ class EventsController < ApplicationController
   private
 
   def safe_params
-    nested_params = [:id, :name, { author: ["given-name", "family-name", :name] }, "alternate-name", :publisher, "provider-id", :periodical, "volume-number", "issue-number", :pagination, :issn, "date-published", "registrant-id", :doi, :url, :type]
+    nested_params = [:id, :name, { author: ["givenName", "familyName", :name] }, "alternateName", :publisher, :periodical, "volumeNumber", "issueNumber", :pagination, :issn, "datePublished", "registrantId", :doi, :url, :type]
     ActiveModelSerializers::Deserialization.jsonapi_parse!(
-      params, only: [:id, "message-action", "source-token", :callback, "subj-id", "obj-id", "relation-type-id", "source-id", :total, :license, "occurred-at", :subj, :obj, subj: nested_params, obj: nested_params],
+      params, only: [:id, "messageAction", "sourceToken", :callback, "subjId", "objId", "relationTypeId", "sourceId", :total, :license, "occurredAt", :subj, :obj, subj: nested_params, obj: nested_params],
               keys: { id: :uuid }    
     )
   end

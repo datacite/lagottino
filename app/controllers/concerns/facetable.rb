@@ -61,7 +61,7 @@ module Facetable
         { "id" => hsh["key"],
           "title" => hsh["key"],
           "count" => hsh["doc_count"],
-          "year-months" => arr }
+          "yearMonths" => arr }
       end
     end
 

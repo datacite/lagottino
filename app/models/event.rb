@@ -77,18 +77,30 @@ class Event < ActiveRecord::Base
       id: { type: :keyword },
       uid: { type: :keyword },
       name: { type: :text },
-      author: { type: :object },
+      author: { type: :object, properties: {
+        "@type" => { type: :keyword },
+        "@id" => { type: :keyword },
+        name: { type: :text },
+        givenName: { type: :text },
+        familyName: { type: :text }
+      }},
       periodical: { type: :text },
-      alternate_name: { type: :text },
-      volume_number: { type: :keyword },
-      issue_number: { type: :keyword },
+      alternateName: { type: :text },
+      volumeNumber: { type: :keyword },
+      issueNumber: { type: :keyword },
       pagination: { type: :keyword },
       publisher: { type: :keyword },
+      funder: { type: :object, properties: {
+        "@type" => { type: :keyword },
+        "@id" => { type: :keyword },
+        name: { type: :text }
+      }},
+      proxyIdentifiers: { type: :keyword },
       version: { type: :keyword },
       issn: { type: :keyword },
-      date_published: { type: :date, format: "date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
-      date_modified: { type: :date, format: "date_optional_time", ignore_malformed: true },
-      provider_id: { type: :keyword },
+      datePublished: { type: :date, format: "date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
+      dateModified: { type: :date, format: "date_optional_time", ignore_malformed: true },
+      registrantId: { type: :keyword },
       cache_key: { type: :keyword }
     }
     indexes :obj,              type: :object, properties: {
@@ -96,18 +108,30 @@ class Event < ActiveRecord::Base
       id: { type: :keyword },
       uid: { type: :keyword },
       name: { type: :text },
-      author: { type: :object },
+      author: { type: :object, properties: {
+        "@type" => { type: :keyword },
+        "@id" => { type: :keyword },
+        name: { type: :text },
+        givenName: { type: :text },
+        familyName: { type: :text }
+      }},
       periodical: { type: :text },
-      alternate_name: { type: :text },
-      volume_number: { type: :keyword },
-      issue_number: { type: :keyword },
+      alternateName: { type: :text },
+      volumeNumber: { type: :keyword },
+      issueNumber: { type: :keyword },
       pagination: { type: :keyword },
       publisher: { type: :keyword },
+      funder: { type: :object, properties: {
+        "@type" => { type: :keyword },
+        "@id" => { type: :keyword },
+        name: { type: :text }
+      }},
+      proxyIdentifiers: { type: :keyword },
       version: { type: :keyword },
       issn: { type: :keyword },
-      date_published: { type: :date, format: "date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
-      date_modified: { type: :date, format: "date_optional_time", ignore_malformed: true },
-      provider_id: { type: :keyword },
+      datePublished: { type: :date, format: "date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
+      dateModified: { type: :date, format: "date_optional_time", ignore_malformed: true },
+      registrantId: { type: :keyword },
       cache_key: { type: :keyword }
     }
     indexes :source_id,        type: :keyword

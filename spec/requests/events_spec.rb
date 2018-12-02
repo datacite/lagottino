@@ -13,21 +13,21 @@ describe "/events", :type => :request do
   let(:success) { { "id"=> event.uuid,
                     "type"=>"events",
                     "attributes"=>{
-                      "subj-id"=>"http://www.citeulike.org/user/dbogartoit",
-                      "obj-id"=>"http://doi.org/10.1371/journal.pmed.0030186",
-                      "message-action"=>"create",
-                      "source-token"=>"citeulike_123",
-                      "relation-type-id"=>"bookmarks",
-                      "source-id"=>"citeulike",
+                      "subjId"=>"http://www.citeulike.org/user/dbogartoit",
+                      "objId"=>"http://doi.org/10.1371/journal.pmed.0030186",
+                      "messageAction"=>"create",
+                      "sourceToken"=>"citeulike_123",
+                      "relationTypeId"=>"bookmarks",
+                      "sourceId"=>"citeulike",
                       "total"=>1,
                       "license"=>"https://creativecommons.org/publicdomain/zero/1.0/",
-                      "occurred-at"=>"2015-04-08T00:00:00.000Z",
+                      "occurredAt"=>"2015-04-08T00:00:00.000Z",
                       "subj"=> {"id"=>"http://www.citeulike.org/user/dbogartoit",
                                 "uid"=>"http://www.citeulike.org/user/dbogartoit",
                                 "author"=>[{"given"=>"dbogartoit"}],
                                 "name"=>"CiteULike bookmarks for user dbogartoit",
                                 "publisher"=>"CiteULike",
-                                "date-published"=>"2006-06-13T16:14:19Z",
+                                "datePublished"=>"2006-06-13T16:14:19Z",
                                 "url"=>"http://www.citeulike.org/user/dbogartoit",
                                 "type"=>"entry"
                       },
@@ -46,12 +46,12 @@ describe "/events", :type => :request do
     let(:params) do
       { "data" => { "type" => "events",
                     "attributes" => {
-                      "subj-id" => event.subj_id,
+                      "subjId" => event.subj_id,
                       "subj" => event.subj,
-                      "obj-id" => event.obj_id,
-                      "relation-type-id" => event.relation_type_id,
-                      "source-id" => event.source_id,
-                      "source-token" => event.source_token } } }
+                      "objId" => event.obj_id,
+                      "relationTypeId" => event.relation_type_id,
+                      "sourceId" => event.source_id,
+                      "sourceToken" => event.source_token } } }
     end
 
     context "as admin user" do
@@ -98,8 +98,8 @@ describe "/events", :type => :request do
         { "data" => { "type" => "events",
                       "attributes" => {
                         "uuid" => uuid,
-                        "subj-id" => event.subj_id,
-                        "source-id" => event.source_id } } }
+                        "subjId" => event.subj_id,
+                        "sourceId" => event.source_id } } }
       end
 
       it "JSON" do
@@ -117,8 +117,8 @@ describe "/events", :type => :request do
         { "data" => { "type" => "events",
                       "attributes" => {
                         "uuid" => uuid,
-                        "subj-id" => event.subj_id,
-                        "source-token" => event.source_token } } }
+                        "subjId" => event.subj_id,
+                        "sourceToken" => event.source_token } } }
       end
 
       it "JSON" do
@@ -136,8 +136,8 @@ describe "/events", :type => :request do
         { "data" => { "type" => "events",
                       "attributes" => {
                         "uuid" => uuid,
-                        "source-id" => event.source_id,
-                        "source-token" => event.source_token } } }
+                        "sourceId" => event.source_id,
+                        "sourceToken" => event.source_token } } }
       end
 
       it "JSON" do
@@ -171,7 +171,7 @@ describe "/events", :type => :request do
         { "event" => { "type" => "events",
                          "attributes" => {
                            "uuid" => uuid,
-                           "source-token" => "123" } } }
+                           "sourceToken" => "123" } } }
       end
 
       it "JSON" do
@@ -220,12 +220,12 @@ describe "/events", :type => :request do
       { "data" => { "type" => "events",
                     "id" => event.uuid,
                     "attributes" => {
-                      "subj-id" => event.subj_id,
+                      "subjId" => event.subj_id,
                       "subj" => event.subj,
-                      "obj-id" => event.obj_id,
-                      "relation-type-id" => event.relation_type_id,
-                      "source-id" => event.source_id,
-                      "source-token" => event.source_token } } }
+                      "objId" => event.obj_id,
+                      "relationTypeId" => event.relation_type_id,
+                      "sourceId" => event.source_id,
+                      "sourceToken" => event.source_token } } }
     end
 
     context "as admin user" do
@@ -272,8 +272,8 @@ describe "/events", :type => :request do
         { "data" => { "type" => "events",
                       "id" => uuid,
                       "attributes" => {
-                        "subj-id" => event.subj_id,
-                        "source-id" => event.source_id } } }
+                        "subjId" => event.subj_id,
+                        "sourceId" => event.source_id } } }
       end
 
       it "JSON" do
@@ -291,8 +291,8 @@ describe "/events", :type => :request do
         { "data" => { "type" => "events",
                       "id" => uuid,
                       "attributes" => {
-                        "subj-id" => event.subj_id,
-                        "source-token" => event.source_token } } }
+                        "subjId" => event.subj_id,
+                        "sourceToken" => event.source_token } } }
       end
 
       it "JSON" do
@@ -310,8 +310,8 @@ describe "/events", :type => :request do
         { "data" => { "type" => "events",
                       "id" => uuid,
                       "attributes" => {
-                        "source-id" => event.source_id,
-                        "source-token" => event.source_token } } }
+                        "sourceId" => event.source_id,
+                        "sourceToken" => event.source_token } } }
       end
 
       it "JSON" do
@@ -345,7 +345,7 @@ describe "/events", :type => :request do
         { "event" => { "type" => "events",
                        "id" => uuid,
                        "attributes" => {
-                         "source-token" => "123" } } }
+                         "sourceToken" => "123" } } }
       end
 
       it "JSON" do
@@ -395,12 +395,12 @@ describe "/events", :type => :request do
       { "data" => { "type" => "events",
                     "id" => event.uuid,
                     "attributes" => {
-                      "subj-id" => event.subj_id,
+                      "subjId" => event.subj_id,
                       "subj" => event.subj,
-                      "obj-id" => event.obj_id,
-                      "relation-type-id" => event.relation_type_id,
-                      "source-id" => event.source_id,
-                      "source-token" => event.source_token } } }
+                      "objId" => event.obj_id,
+                      "relationTypeId" => event.relation_type_id,
+                      "sourceId" => event.source_id,
+                      "sourceToken" => event.source_token } } }
     end
 
     context "as admin user" do
@@ -462,7 +462,7 @@ describe "/events", :type => :request do
         { "event" => { "type" => "events",
                        "id" => uuid,
                        "attributes" => {
-                         "source-token" => "123" } } }
+                         "sourceToken" => "123" } } }
       end
 
       it "JSON" do
