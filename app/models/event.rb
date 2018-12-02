@@ -163,6 +163,7 @@ class Event < ActiveRecord::Base
       "subj" => subj.merge(cache_key: subj_cache_key),
       "obj" => obj.merge(cache_key: obj_cache_key),
       "doi" => doi,
+      "orcid" => orcid,
       "prefix" => prefix,
       "subtype" => subtype,
       "citation_type" => citation_type,
@@ -266,6 +267,10 @@ class Event < ActiveRecord::Base
   end
 
   def doi
+    Array.wrap(subj["proxyIdentifiers"]).grep(/\A10\.\d{4,5}\/.+\z/) { $1 } +
+    Array.wrap(obj["proxyIdentifiers"]).grep(/\A10\.\d{4,5}\/.+\z/) { $1 } +
+    Array.wrap(subj["funder"]).map { |f| doi_from_url(f["@id"]) }.compact +
+    Array.wrap(obj["funder"]).map { |f| doi_from_url(f["@id"]) }.compact +
     [doi_from_url(subj_id), doi_from_url(obj_id)].compact
   end
 
@@ -274,6 +279,8 @@ class Event < ActiveRecord::Base
   end
 
   def orcid
+    Array.wrap(subj["author"]).map { |f| orcid_from_url(f["@id"]) }.compact +
+    Array.wrap(obj["author"]).map { |f| orcid_from_url(f["@id"]) }.compact +
     [orcid_from_url(subj_id), orcid_from_url(obj_id)].compact
   end
 
