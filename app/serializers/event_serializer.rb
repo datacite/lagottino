@@ -10,5 +10,13 @@ class EventSerializer
   belongs_to :subj, serializer: ObjectSerializer, record_type: :objects
   belongs_to :obj, serializer: ObjectSerializer, record_type: :objects
 
+  attribute :subj do |object|
+    object.subj.compact
+  end
+
+  attribute :obj do |object|
+    object.obj.compact
+  end
+  
   attribute :timestamp, &:updated_at
 end

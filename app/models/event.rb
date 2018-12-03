@@ -77,6 +77,8 @@ class Event < ActiveRecord::Base
       id: { type: :keyword },
       uid: { type: :keyword },
       name: { type: :text },
+      givenName: { type: :text },
+      familyName: { type: :text },
       author: { type: :object, properties: {
         "@type" => { type: :keyword },
         "@id" => { type: :keyword },
@@ -116,6 +118,8 @@ class Event < ActiveRecord::Base
       id: { type: :keyword },
       uid: { type: :keyword },
       name: { type: :text },
+      givenName: { type: :text },
+      familyName: { type: :text },
       author: { type: :object, properties: {
         "@type" => { type: :keyword },
         "@id" => { type: :keyword },
