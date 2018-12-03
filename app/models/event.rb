@@ -84,12 +84,21 @@ class Event < ActiveRecord::Base
         givenName: { type: :text },
         familyName: { type: :text }
       }},
-      periodical: { type: :text },
+      periodical: { type: :object, properties: {
+        "@type" => { type: :keyword },
+        "@id" => { type: :keyword },
+        name: { type: :text },
+        "issn" => { type: :keyword }
+      }},
       alternateName: { type: :text },
       volumeNumber: { type: :keyword },
       issueNumber: { type: :keyword },
       pagination: { type: :keyword },
-      publisher: { type: :keyword },
+      publisher: { type: :object, properties: {
+        "@type" => { type: :keyword },
+        "@id" => { type: :keyword },
+        name: { type: :text }
+      }},
       funder: { type: :object, properties: {
         "@type" => { type: :keyword },
         "@id" => { type: :keyword },
@@ -97,7 +106,6 @@ class Event < ActiveRecord::Base
       }},
       proxyIdentifiers: { type: :keyword },
       version: { type: :keyword },
-      issn: { type: :keyword },
       datePublished: { type: :date, format: "date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
       dateModified: { type: :date, format: "date_optional_time", ignore_malformed: true },
       registrantId: { type: :keyword },
@@ -115,12 +123,21 @@ class Event < ActiveRecord::Base
         givenName: { type: :text },
         familyName: { type: :text }
       }},
-      periodical: { type: :text },
+      periodical: { type: :object, properties: {
+        "@type" => { type: :keyword },
+        "@id" => { type: :keyword },
+        name: { type: :text },
+        "issn" => { type: :keyword }
+      }},
       alternateName: { type: :text },
       volumeNumber: { type: :keyword },
       issueNumber: { type: :keyword },
       pagination: { type: :keyword },
-      publisher: { type: :keyword },
+      publisher: { type: :object, properties: {
+        "@type" => { type: :keyword },
+        "@id" => { type: :keyword },
+        name: { type: :text }
+      }},
       funder: { type: :object, properties: {
         "@type" => { type: :keyword },
         "@id" => { type: :keyword },
@@ -128,7 +145,6 @@ class Event < ActiveRecord::Base
       }},
       proxyIdentifiers: { type: :keyword },
       version: { type: :keyword },
-      issn: { type: :keyword },
       datePublished: { type: :date, format: "date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
       dateModified: { type: :date, format: "date_optional_time", ignore_malformed: true },
       registrantId: { type: :keyword },
@@ -167,7 +183,6 @@ class Event < ActiveRecord::Base
       "prefix" => prefix,
       "subtype" => subtype,
       "citation_type" => citation_type,
-      #"issn" => issn,
       "source_id" => source_id,
       "source_token" => source_token,
       "message_action" => message_action,
@@ -247,8 +262,8 @@ class Event < ActiveRecord::Base
                "type" => "events",
                "state" => aasm_state,
                "errors" => error_messages,
-               "message_action" => message_action,
-               "source_token" => source_token,
+               "messageAction" => message_action,
+               "sourceToken" => source_token,
                "total" => total,
                "timestamp" => timestamp }}
     Maremma.post(callback, data: data.to_json, token: ENV['API_KEY'])
@@ -289,7 +304,7 @@ class Event < ActiveRecord::Base
   end
 
   def registrant_id
-    [subj["provider_id"], obj["provider_id"]].compact
+    [subj["registrantId"], obj["registrantId"], subj["provider_id"], obj["provider_id"]].compact
   end
 
   def subtype
@@ -297,7 +312,7 @@ class Event < ActiveRecord::Base
   end
 
   def citation_type
-    return nil if subj["type"].blank? || subj["type"] == "creative-work" || obj["type"].blank? || obj["type"] == "creative-work"
+    return nil if subj["type"].blank? || subj["type"] == "CreativeWork" || obj["type"].blank? || obj["type"] == "CreativeWork"
 
    [subj["type"], obj["type"]].compact.sort.join("-")
   end
@@ -327,12 +342,12 @@ class Event < ActiveRecord::Base
   end
 
   def subj_cache_key
-    timestamp = subj["date_modified"] || Time.zone.now.iso8601
+    timestamp = subj["dateModified"] || Time.zone.now.iso8601
     "objects/#{subj_id}-#{timestamp}"
   end
 
   def obj_cache_key
-    timestamp = obj["date_modified"] || Time.zone.now.iso8601
+    timestamp = obj["dateModified"] || Time.zone.now.iso8601
     "objects/#{obj_id}-#{timestamp}"
   end
 
