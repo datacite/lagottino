@@ -22,8 +22,8 @@ describe "/events", :type => :request do
                       "total"=>1,
                       "license"=>"https://creativecommons.org/publicdomain/zero/1.0/",
                       "occurredAt"=>"2015-04-08T00:00:00.000Z",
-                      "subj"=> {"id"=>"http://www.citeulike.org/user/dbogartoit",
-                                "type"=>"CreativeWork",
+                      "subj"=> {"@id"=>"http://www.citeulike.org/user/dbogartoit",
+                                "@type"=>"CreativeWork",
                                 "author"=>[{"givenName"=>"dbogartoit"}],
                                 "name"=>"CiteULike bookmarks for user dbogartoit",
                                 "publisher"=> { "@type" => "Organization", "name" => "CiteULike" },
@@ -33,8 +33,7 @@ describe "/events", :type => :request do
                                 "proxyIdentifiers" => ["10.13039/100011326"],
                                 "datePublished"=>"2006-06-13T16:14:19Z",
                                 "dateModified"=>"2006-06-13T16:14:19Z",
-                                "url"=>"http://www.citeulike.org/user/dbogartoit",
-                                "type"=>"entry"
+                                "url"=>"http://www.citeulike.org/user/dbogartoit"
                       },
                       "obj"=>{}
                     }}}

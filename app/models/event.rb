@@ -71,10 +71,10 @@ class Event < ActiveRecord::Base
     indexes :prefix,           type: :keyword
     indexes :subtype,          type: :keyword
     indexes :citation_type,    type: :keyword
-    #indexes :issn,             type: :keyword
+    indexes :issn,             type: :keyword
     indexes :subj,             type: :object, properties: {
-      type: { type: :keyword },
-      id: { type: :keyword },
+      "@type" => { type: :keyword },
+      "@id" => { type: :keyword },
       uid: { type: :keyword },
       name: { type: :text },
       givenName: { type: :text },
@@ -114,8 +114,8 @@ class Event < ActiveRecord::Base
       cache_key: { type: :keyword }
     }
     indexes :obj,              type: :object, properties: {
-      type: { type: :keyword },
-      id: { type: :keyword },
+      "@type" => { type: :keyword },
+      "@id" => { type: :keyword },
       uid: { type: :keyword },
       name: { type: :text },
       givenName: { type: :text },
@@ -184,6 +184,7 @@ class Event < ActiveRecord::Base
       "obj" => obj.merge(cache_key: obj_cache_key),
       "doi" => doi,
       "orcid" => orcid,
+      "issn" => issn,
       "prefix" => prefix,
       "subtype" => subtype,
       "citation_type" => citation_type,
@@ -304,7 +305,8 @@ class Event < ActiveRecord::Base
   end
 
   def issn
-    (Array.wrap(subj["issn"]) + Array.wrap(obj["issn"])).compact
+    Array.wrap(subj.dig("periodical", "issn")).compact + 
+    Array.wrap(obj.dig("periodical", "issn")).compact
   end
 
   def registrant_id
@@ -312,13 +314,13 @@ class Event < ActiveRecord::Base
   end
 
   def subtype
-    [subj["type"], obj["type"]].compact
+    [subj["@type"], obj["@type"]].compact
   end
 
   def citation_type
-    return nil if subj["type"].blank? || subj["type"] == "CreativeWork" || obj["type"].blank? || obj["type"] == "CreativeWork"
+    return nil if subj["@type"].blank? || subj["@type"] == "CreativeWork" || obj["@type"].blank? || obj["@type"] == "CreativeWork"
 
-   [subj["type"], obj["type"]].compact.sort.join("-")
+   [subj["@type"], obj["@type"]].compact.sort.join("-")
   end
 
   def doi_from_url(url)
