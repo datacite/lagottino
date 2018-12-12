@@ -305,8 +305,8 @@ class Event < ActiveRecord::Base
   end
 
   def issn
-    Array.wrap(subj.dig("periodical", "issn")).compact + 
-    Array.wrap(obj.dig("periodical", "issn")).compact
+    (subj.is_a?(Hash) ? Array.wrap(subj.dig("periodical", "issn")).compact : []) +  
+    (obj.is_a?(Hash) ? Array.wrap(obj.dig("periodical", "issn")).compact : [])
   end
 
   def registrant_id
