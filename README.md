@@ -26,6 +26,13 @@ bundle exec rake event:index
 
 ```
 
+To delete events by subj-id, for example events with subj-id 'https://doi.org/10.1007/s10680-018-9485-1':
+
+```bash
+bundle exec rake event:detete_by_sub_id[https://doi.org/10.1007/s10680-018-9485-1]
+
+```
+
 ## Development
 
 We use Rspec for testing:
