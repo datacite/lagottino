@@ -17,6 +17,15 @@ docker-compose up
 
 You can now point your browser to `http://localhost:8085` and use the application. Some API endpoints require authentication.
 
+To populate the database and index with resources:
+
+```bash
+bundle exec rake elasticsearch:event:create_index
+bundle exec rake elasticsearch:event:import
+bundle exec rake event:index
+
+```
+
 ## Development
 
 We use Rspec for testing:
