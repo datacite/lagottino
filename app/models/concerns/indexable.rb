@@ -49,17 +49,26 @@ module Indexable
       })
     end
 
+    def normalize_doi(doi)
+      doi = Array(/\A(?:(http|https):\/(\/)?(dx\.)?(doi.org|handle.test.datacite.org)\/)?(doi:)?(10\.\d{4,5}\/.+)\z/.match(doi)).last
+      doi = doi.delete("\u200B").downcase if doi.present?
+      "https://doi.org/#{doi}" if doi.present?
+    end
+
     def find_by_ids(ids, options={})
-      options[:cursor] ||= -1
+      dois = ids.split(",").map do |doi|
+        normalize_doi(doi).to_s
+      end
+
+      options[:cursor] ||= nil
 
       __elasticsearch__.search({
         size: 1000,
         from: 0,
-        search_after: options[:cursor],
         sort: [{ updated_at: { order: 'asc' }}],
         query: {
           terms: {
-            obj_id: ids.split(",").map(&:upcase)
+            obj_id: dois
           }
         },
         aggregations: query_aggregations
