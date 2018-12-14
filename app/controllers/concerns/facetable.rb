@@ -126,6 +126,23 @@ module Facetable
           "count" => hsh["doc_count"] }
       end
     end
+  
+    def facet_by_dois(arr)
+      arr.map do |hsh|
+        arr = hsh.dig("relation_types", "buckets").map do |h|
+          title = h["key"]
+          {
+            "id" => h["key"],
+            "title" => title,
+            "sum" => h.dig("total_by_type", "value") }
+        end
+        arr.reject! {|h| h["id"] == hsh["key"]}
+        { "id" => hsh["key"],
+          "title" => hsh["key"],
+          "count" => hsh["doc_count"],
+          "relationTypes" => arr }
+      end
+    end
 
     # def facet_by_registrant(arr)
     #   # generate hash with id and name for each registrant in facet

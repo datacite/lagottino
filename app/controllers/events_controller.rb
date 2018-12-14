@@ -116,6 +116,7 @@ class EventsController < ApplicationController
     relation_types = total > 0 ? facet_by_relation_type(response.response.aggregations.relation_types.buckets) : nil  
     registrants = total > 0  && params[:extra] ? facet_by_registrants(response.response.aggregations.registrants.buckets) : nil   
     pairings = total > 0 && params[:extra] ? facet_by_pairings(response.response.aggregations.pairings.buckets) : nil
+    dois = total > 0 && params[:extra] ? facet_by_dois(response.response.aggregations.dois.buckets) : nil
 
     @events = response.results.results
 
@@ -128,7 +129,8 @@ class EventsController < ApplicationController
       "citationTypes" => citation_types,
       "relationTypes" => relation_types,
       pairings: pairings,
-      registrants: registrants
+      registrants: registrants,
+      "doisRelationTypes": dois
     }.compact
 
     options[:links] = {
