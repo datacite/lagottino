@@ -91,7 +91,7 @@ class Event < ActiveRecord::Base
       provider_id: { type: :keyword },
       cache_key: { type: :keyword }
     }
-    indexes :obj,              type: :object, properties: {
+    indexes :obj,               type: :object, properties: {
       type: { type: :keyword },
       id: { type: :keyword },
       uid: { type: :keyword },
@@ -180,36 +180,56 @@ class Event < ActiveRecord::Base
   end
 
   def self.index(options={})
-    from_date = options[:from_date].present? ? Date.parse(options[:from_date]) : Date.current
-    until_date = options[:until_date].present? ? Date.parse(options[:until_date]) : Date.current
+    from_id = (options[:from_id] || 1).to_i
+    until_id = (options[:until_id] || from_id + 499).to_i
 
-    # get first day of every month between from_date and until_date
-    (from_date..until_date).each do |d|
-      EventIndexByDayJob.perform_later(from_date: d.strftime("%F"))
+    # get every id between from_id and until_id
+    (from_id..until_id).step(500).each do |id|
+      EventIndexByIdJob.perform_later(id: id)
+      puts "Queued indexing for events with IDs starting with #{id}."
     end
-
-    "Queued indexing for events created from #{from_date.strftime("%F")} until #{until_date.strftime("%F")}."
   end
 
-  def self.index_by_day(options={})
-    from_date = options[:from_date].present? ? Date.parse(options[:from_date]) : Date.current
+  def self.index_by_id(options={})
+    return nil unless options[:id].present?
+    id = options[:id].to_i
+
     errors = 0
     count = 0
 
     logger = Logger.new(STDOUT)
 
-    Event.where("created_at >= ?", from_date.strftime("%F") + " 00:00:00").where("created_at < ?", (from_date + 1.day).strftime("%F") + " 00:00:00").where("updated_at > indexed_at").find_in_batches(batch_size: 1000) do |events|
+    Event.where(id: id..(id + 499)).find_in_batches(batch_size: 500) do |events|
       response = Event.__elasticsearch__.client.bulk \
         index:   Event.index_name,
         type:    Event.document_type,
         body:    events.map { |event| { index: { _id: event.id, data: event.as_indexed_json } } }
 
+      # log errors
       errors += response['items'].map { |k, v| k.values.first['error'] }.compact.length
+      response['items'].select { |k, v| k.values.first['error'].present? }.each do |err|
+        logger.error "[Elasticsearch] " + err.inspect
+      end
+
       count += events.length
-      events.each { |event| event.update_column(:indexed_at, Time.zone.now) }
     end
 
-    logger.info "[Elasticsearch] #{errors} errors indexing #{count} events created on #{from_date.strftime("%F")}."
+    if errors > 1
+      logger.error "[Elasticsearch] #{errors} errors indexing #{count} events with IDs #{id} - #{(id + 499)}."
+    elsif count > 0
+      logger.info "[Elasticsearch] Indexed #{count} events with IDs #{id} - #{(id + 499)}."
+    end
+  rescue Elasticsearch::Transport::Transport::Errors::RequestEntityTooLarge, Faraday::ConnectionFailed, ActiveRecord::LockWaitTimeout => error
+    logger.info "[Elasticsearch] Error #{error.message} indexing events with IDs #{id} - #{(id + 499)}."
+
+    count = 0
+
+    Event.where(id: id..(id + 499)).find_each do |event|
+      IndexJob.perform_later(event)
+      count += 1
+    end
+
+    logger.info "[Elasticsearch] Indexed #{count} events with IDs #{id} - #{(id + 499)}."
   end
 
   def to_param  # overridden, use uuid instead of id
