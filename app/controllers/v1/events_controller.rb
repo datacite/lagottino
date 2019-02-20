@@ -1,4 +1,4 @@
-class EventsController < ApplicationController
+class V1::EventsController < ApplicationController
 
   include Identifiable
 
@@ -26,7 +26,7 @@ class EventsController < ApplicationController
       options = {}
       options[:is_collection] = false
       
-      render json: EventSerializer.new(@event, options).serialized_json, status: exists ? :ok : :created
+      render json: V1::EventSerializer.new(@event, options).serialized_json, status: exists ? :ok : :created
     else
       errors = @event.errors.full_messages.map { |message| { status: 422, title: message } }
       render json: { errors: errors }, status: :unprocessable_entity
@@ -46,7 +46,7 @@ class EventsController < ApplicationController
       options = {}
       options[:is_collection] = false
       
-      render json: EventSerializer.new(@event, options).serialized_json, status: exists ? :ok : :created
+      render json: V1::EventSerializer.new(@event, options).serialized_json, status: exists ? :ok : :created
     else
       errors = @event.errors.full_messages.map { |message| { status: 422, title: message } }
       render json: { errors: errors }, status: :unprocessable_entity
@@ -58,7 +58,7 @@ class EventsController < ApplicationController
     options[:include] = @include
     options[:is_collection] = false
 
-    render json: EventSerializer.new(@event, options).serialized_json, status: :ok
+    render json: V1::EventSerializer.new(@event, options).serialized_json, status: :ok
   end
 
   def index
@@ -116,21 +116,19 @@ class EventsController < ApplicationController
     relation_types = total > 0 ? facet_by_relation_type(response.response.aggregations.relation_types.buckets) : nil  
     registrants = total > 0  && params[:extra] ? facet_by_registrants(response.response.aggregations.registrants.buckets) : nil   
     pairings = total > 0 && params[:extra] ? facet_by_pairings(response.response.aggregations.pairings.buckets) : nil
-    dois = total > 0 && params[:extra] ? facet_by_dois(response.response.aggregations.dois.buckets) : nil
 
     @events = response.results.results
 
     options = {}
     options[:meta] = {
       total: total,
-      "totalPages" => total_pages,
+      "total-pages" => total_pages,
       sources: sources,
       prefixes: prefixes,
-      "citationTypes" => citation_types,
-      "relationTypes" => relation_types,
+      "citation-types" => citation_types,
+      "relation-types" => relation_types,
       pairings: pairings,
-      registrants: registrants,
-      "doisRelationTypes": dois
+      registrants: registrants
     }.compact
 
     options[:links] = {
@@ -156,7 +154,7 @@ class EventsController < ApplicationController
     options[:include] = @include
     options[:is_collection] = true
 
-    render json: EventSerializer.new(@events, options).serialized_json, status: :ok
+    render json: V1::EventSerializer.new(@events, options).serialized_json, status: :ok
   end
 
   def destroy
@@ -188,10 +186,10 @@ class EventsController < ApplicationController
   private
 
   def safe_params
-    nested_params = [:id, :name, { author: ["givenName", "familyName", :name] }, :funder, { funder: ["@id", "@type", :name] }, "alternateName", "proxyIdentifiers", { "proxyIdentifiers" => [] }, :publisher, :periodical, { periodical: [:type, :id, :name, :issn] }, "volumeNumber", "issueNumber", :pagination, :issn, "datePublished", "dateModified", "registrantId", :doi, :url, :type]
+    nested_params = [:id, :name, { author: ["given-name", "family-name", :name] }, "alternate-name", :publisher, "provider-id", :periodical, "volume-number", "issue-number", :pagination, :issn, "date-published", "registrant-id", :doi, :url, :type]
     ActiveModelSerializers::Deserialization.jsonapi_parse!(
-      params, only: [:id, "messageAction", "sourceToken", :callback, "subjId", "objId", "relationTypeId", "sourceId", :total, :license, "occurredAt", :subj, :obj, subj: nested_params, obj: nested_params],
-              keys: { id: :uuid }
+      params, only: [:id, "message-action", "source-token", :callback, "subj-id", "obj-id", "relation-type-id", "source-id", :total, :license, "occurred-at", :subj, :obj, subj: nested_params, obj: nested_params],
+              keys: { id: :uuid }    
     )
   end
 end

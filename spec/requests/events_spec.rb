@@ -41,7 +41,7 @@ describe "/events", :type => :request do
   let(:token) { User.generate_token(role_id: "staff_admin") }
   let(:uuid) { SecureRandom.uuid }
   let(:headers) do
-    { "HTTP_ACCEPT" => "application/json",
+    { "HTTP_ACCEPT" => "application/vnd.api+json; version=2",
       "HTTP_AUTHORIZATION" => "Bearer #{token}" }
   end
 
@@ -97,7 +97,7 @@ describe "/events", :type => :request do
       end
     end
 
-    context "without source-token" do
+    context "without sourceToken" do
       let(:params) do
         { "data" => { "type" => "events",
                       "attributes" => {
@@ -116,7 +116,7 @@ describe "/events", :type => :request do
       end
     end
 
-    context "without source-id" do
+    context "without sourceId" do
       let(:params) do
         { "data" => { "type" => "events",
                       "attributes" => {
@@ -135,7 +135,7 @@ describe "/events", :type => :request do
       end
     end
 
-    context "without subj-id" do
+    context "without subjId" do
       let(:params) do
         { "data" => { "type" => "events",
                       "attributes" => {
@@ -156,7 +156,7 @@ describe "/events", :type => :request do
 
     context "with wrong API token" do
       let(:headers) do
-        { "HTTP_ACCEPT" => "application/json",
+        { "HTTP_ACCEPT" => "application/vnd.api+json; version=2",
           "HTTP_AUTHORIZATION" => "Bearer 12345678" }
       end
 
@@ -271,7 +271,7 @@ describe "/events", :type => :request do
       end
     end
 
-    context "without source-token" do
+    context "without sourceToken" do
       let(:params) do
         { "data" => { "type" => "events",
                       "id" => uuid,
@@ -290,7 +290,7 @@ describe "/events", :type => :request do
       end
     end
 
-    context "without source-id" do
+    context "without sourceId" do
       let(:params) do
         { "data" => { "type" => "events",
                       "id" => uuid,
@@ -309,7 +309,7 @@ describe "/events", :type => :request do
       end
     end
 
-    context "without subj-id" do
+    context "without subjId" do
       let(:params) do
         { "data" => { "type" => "events",
                       "id" => uuid,
@@ -330,7 +330,7 @@ describe "/events", :type => :request do
 
     context "with wrong API token" do
       let(:headers) do
-        { "HTTP_ACCEPT" => "application/json",
+        { "HTTP_ACCEPT" => "application/vnd.api+json; version=2",
           "HTTP_AUTHORIZATION" => "Bearer 12345678" }
       end
 
@@ -447,7 +447,7 @@ describe "/events", :type => :request do
 
     context "with wrong API token" do
       let(:headers) do
-        { "HTTP_ACCEPT" => "application/json",
+        { "HTTP_ACCEPT" => "application/vnd.api+json; version=2",
           "HTTP_AUTHORIZATION" => "Bearer 12345678" }
       end
 
