@@ -1,6 +1,6 @@
 language: ruby
 rvm:
-- 2.4.1
+- 2.4.4
 sudo: required
 
 services:
@@ -11,6 +11,13 @@ services:
 addons:
   code_climate:
     repo_token: $CODECLIMATE_REPO_TOKEN
+  apt:
+    packages:
+      - oracle-java8-set-default
+      - mysql-server
+      - mysql-client
+    sources:
+      - mysql-5.7-trusty
 
 before_install:
   - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.3.2.deb
@@ -50,6 +57,7 @@ after_success:
       docker build -f Dockerfile -t $REPO:$TRAVIS_BRANCH .;
       docker push $REPO:$TRAVIS_BRANCH;
       echo "Pushed to" $REPO:$TRAVIS_BRANCH;
+      AUTO_DEPLOY=true;
     fi
 
   - if [ "$AUTO_DEPLOY" == "true" ]; then

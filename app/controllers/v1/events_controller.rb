@@ -1,4 +1,4 @@
-class EventsController < ApplicationController
+class V1::EventsController < ApplicationController
 
   include Identifiable
 
@@ -26,7 +26,7 @@ class EventsController < ApplicationController
       options = {}
       options[:is_collection] = false
       
-      render json: EventSerializer.new(@event, options).serialized_json, status: exists ? :ok : :created
+      render json: V1::EventSerializer.new(@event, options).serialized_json, status: exists ? :ok : :created
     else
       errors = @event.errors.full_messages.map { |message| { status: 422, title: message } }
       render json: { errors: errors }, status: :unprocessable_entity
@@ -46,7 +46,7 @@ class EventsController < ApplicationController
       options = {}
       options[:is_collection] = false
       
-      render json: EventSerializer.new(@event, options).serialized_json, status: exists ? :ok : :created
+      render json: V1::EventSerializer.new(@event, options).serialized_json, status: exists ? :ok : :created
     else
       errors = @event.errors.full_messages.map { |message| { status: 422, title: message } }
       render json: { errors: errors }, status: :unprocessable_entity
@@ -58,7 +58,7 @@ class EventsController < ApplicationController
     options[:include] = @include
     options[:is_collection] = false
 
-    render json: EventSerializer.new(@event, options).serialized_json, status: :ok
+    render json: V1::EventSerializer.new(@event, options).serialized_json, status: :ok
   end
 
   def index
@@ -154,7 +154,7 @@ class EventsController < ApplicationController
     options[:include] = @include
     options[:is_collection] = true
 
-    render json: EventSerializer.new(@events, options).serialized_json, status: :ok
+    render json: V1::EventSerializer.new(@events, options).serialized_json, status: :ok
   end
 
   def destroy

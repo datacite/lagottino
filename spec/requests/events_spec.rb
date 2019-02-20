@@ -13,23 +13,27 @@ describe "/events", :type => :request do
   let(:success) { { "id"=> event.uuid,
                     "type"=>"events",
                     "attributes"=>{
-                      "subj-id"=>"http://www.citeulike.org/user/dbogartoit",
-                      "obj-id"=>"http://doi.org/10.1371/journal.pmed.0030186",
-                      "message-action"=>"create",
-                      "source-token"=>"citeulike_123",
-                      "relation-type-id"=>"bookmarks",
-                      "source-id"=>"citeulike",
+                      "subjId"=>"http://www.citeulike.org/user/dbogartoit",
+                      "objId"=>"http://doi.org/10.1371/journal.pmed.0030186",
+                      "messageAction"=>"create",
+                      "sourceToken"=>"citeulike_123",
+                      "relationTypeId"=>"bookmarks",
+                      "sourceId"=>"citeulike",
                       "total"=>1,
                       "license"=>"https://creativecommons.org/publicdomain/zero/1.0/",
-                      "occurred-at"=>"2015-04-08T00:00:00.000Z",
-                      "subj"=> {"id"=>"http://www.citeulike.org/user/dbogartoit",
-                                "uid"=>"http://www.citeulike.org/user/dbogartoit",
-                                "author"=>[{"given"=>"dbogartoit"}],
+                      "occurredAt"=>"2015-04-08T00:00:00.000Z",
+                      "subj"=> {"@id"=>"http://www.citeulike.org/user/dbogartoit",
+                                "@type"=>"CreativeWork",
+                                "author"=>[{"givenName"=>"dbogartoit"}],
                                 "name"=>"CiteULike bookmarks for user dbogartoit",
-                                "publisher"=>"CiteULike",
-                                "date-published"=>"2006-06-13T16:14:19Z",
-                                "url"=>"http://www.citeulike.org/user/dbogartoit",
-                                "type"=>"entry"
+                                "publisher"=> { "@type" => "Organization", "name" => "CiteULike" },
+                                "periodical"=> { "@type" => "Periodical",  "@id" => "https://doi.org/10.13039/100011326", "name" => "CiteULike", "issn" => "9812-847X" },
+                                "funder"=> { "@type" => "Organization", "@id" => "https://doi.org/10.13039/100011326", "name" => "CiteULike" },
+                                "version" => "1.0",
+                                "proxyIdentifiers" => ["10.13039/100011326"],
+                                "datePublished"=>"2006-06-13T16:14:19Z",
+                                "dateModified"=>"2006-06-13T16:14:19Z",
+                                "url"=>"http://www.citeulike.org/user/dbogartoit"
                       },
                       "obj"=>{}
                     }}}
@@ -37,7 +41,7 @@ describe "/events", :type => :request do
   let(:token) { User.generate_token(role_id: "staff_admin") }
   let(:uuid) { SecureRandom.uuid }
   let(:headers) do
-    { "HTTP_ACCEPT" => "application/json",
+    { "HTTP_ACCEPT" => "application/vnd.api+json; version=2",
       "HTTP_AUTHORIZATION" => "Bearer #{token}" }
   end
 
@@ -46,12 +50,12 @@ describe "/events", :type => :request do
     let(:params) do
       { "data" => { "type" => "events",
                     "attributes" => {
-                      "subj-id" => event.subj_id,
+                      "subjId" => event.subj_id,
                       "subj" => event.subj,
-                      "obj-id" => event.obj_id,
-                      "relation-type-id" => event.relation_type_id,
-                      "source-id" => event.source_id,
-                      "source-token" => event.source_token } } }
+                      "objId" => event.obj_id,
+                      "relationTypeId" => event.relation_type_id,
+                      "sourceId" => event.source_id,
+                      "sourceToken" => event.source_token } } }
     end
 
     context "as admin user" do
@@ -93,13 +97,13 @@ describe "/events", :type => :request do
       end
     end
 
-    context "without source-token" do
+    context "without sourceToken" do
       let(:params) do
         { "data" => { "type" => "events",
                       "attributes" => {
                         "uuid" => uuid,
-                        "subj-id" => event.subj_id,
-                        "source-id" => event.source_id } } }
+                        "subjId" => event.subj_id,
+                        "sourceId" => event.source_id } } }
       end
 
       it "JSON" do
@@ -112,13 +116,13 @@ describe "/events", :type => :request do
       end
     end
 
-    context "without source-id" do
+    context "without sourceId" do
       let(:params) do
         { "data" => { "type" => "events",
                       "attributes" => {
                         "uuid" => uuid,
-                        "subj-id" => event.subj_id,
-                        "source-token" => event.source_token } } }
+                        "subjId" => event.subj_id,
+                        "sourceToken" => event.source_token } } }
       end
 
       it "JSON" do
@@ -131,13 +135,13 @@ describe "/events", :type => :request do
       end
     end
 
-    context "without subj-id" do
+    context "without subjId" do
       let(:params) do
         { "data" => { "type" => "events",
                       "attributes" => {
                         "uuid" => uuid,
-                        "source-id" => event.source_id,
-                        "source-token" => event.source_token } } }
+                        "sourceId" => event.source_id,
+                        "sourceToken" => event.source_token } } }
       end
 
       it "JSON" do
@@ -152,7 +156,7 @@ describe "/events", :type => :request do
 
     context "with wrong API token" do
       let(:headers) do
-        { "HTTP_ACCEPT" => "application/json",
+        { "HTTP_ACCEPT" => "application/vnd.api+json; version=2",
           "HTTP_AUTHORIZATION" => "Bearer 12345678" }
       end
 
@@ -171,7 +175,7 @@ describe "/events", :type => :request do
         { "event" => { "type" => "events",
                          "attributes" => {
                            "uuid" => uuid,
-                           "source-token" => "123" } } }
+                           "sourceToken" => "123" } } }
       end
 
       it "JSON" do
@@ -220,12 +224,12 @@ describe "/events", :type => :request do
       { "data" => { "type" => "events",
                     "id" => event.uuid,
                     "attributes" => {
-                      "subj-id" => event.subj_id,
+                      "subjId" => event.subj_id,
                       "subj" => event.subj,
-                      "obj-id" => event.obj_id,
-                      "relation-type-id" => event.relation_type_id,
-                      "source-id" => event.source_id,
-                      "source-token" => event.source_token } } }
+                      "objId" => event.obj_id,
+                      "relationTypeId" => event.relation_type_id,
+                      "sourceId" => event.source_id,
+                      "sourceToken" => event.source_token } } }
     end
 
     context "as admin user" do
@@ -267,13 +271,13 @@ describe "/events", :type => :request do
       end
     end
 
-    context "without source-token" do
+    context "without sourceToken" do
       let(:params) do
         { "data" => { "type" => "events",
                       "id" => uuid,
                       "attributes" => {
-                        "subj-id" => event.subj_id,
-                        "source-id" => event.source_id } } }
+                        "subjId" => event.subj_id,
+                        "sourceId" => event.source_id } } }
       end
 
       it "JSON" do
@@ -286,13 +290,13 @@ describe "/events", :type => :request do
       end
     end
 
-    context "without source-id" do
+    context "without sourceId" do
       let(:params) do
         { "data" => { "type" => "events",
                       "id" => uuid,
                       "attributes" => {
-                        "subj-id" => event.subj_id,
-                        "source-token" => event.source_token } } }
+                        "subjId" => event.subj_id,
+                        "sourceToken" => event.source_token } } }
       end
 
       it "JSON" do
@@ -305,13 +309,13 @@ describe "/events", :type => :request do
       end
     end
 
-    context "without subj-id" do
+    context "without subjId" do
       let(:params) do
         { "data" => { "type" => "events",
                       "id" => uuid,
                       "attributes" => {
-                        "source-id" => event.source_id,
-                        "source-token" => event.source_token } } }
+                        "sourceId" => event.source_id,
+                        "sourceToken" => event.source_token } } }
       end
 
       it "JSON" do
@@ -326,7 +330,7 @@ describe "/events", :type => :request do
 
     context "with wrong API token" do
       let(:headers) do
-        { "HTTP_ACCEPT" => "application/json",
+        { "HTTP_ACCEPT" => "application/vnd.api+json; version=2",
           "HTTP_AUTHORIZATION" => "Bearer 12345678" }
       end
 
@@ -345,7 +349,7 @@ describe "/events", :type => :request do
         { "event" => { "type" => "events",
                        "id" => uuid,
                        "attributes" => {
-                         "source-token" => "123" } } }
+                         "sourceToken" => "123" } } }
       end
 
       it "JSON" do
@@ -395,12 +399,12 @@ describe "/events", :type => :request do
       { "data" => { "type" => "events",
                     "id" => event.uuid,
                     "attributes" => {
-                      "subj-id" => event.subj_id,
+                      "subjId" => event.subj_id,
                       "subj" => event.subj,
-                      "obj-id" => event.obj_id,
-                      "relation-type-id" => event.relation_type_id,
-                      "source-id" => event.source_id,
-                      "source-token" => event.source_token } } }
+                      "objId" => event.obj_id,
+                      "relationTypeId" => event.relation_type_id,
+                      "sourceId" => event.source_id,
+                      "sourceToken" => event.source_token } } }
     end
 
     context "as admin user" do
@@ -443,7 +447,7 @@ describe "/events", :type => :request do
 
     context "with wrong API token" do
       let(:headers) do
-        { "HTTP_ACCEPT" => "application/json",
+        { "HTTP_ACCEPT" => "application/vnd.api+json; version=2",
           "HTTP_AUTHORIZATION" => "Bearer 12345678" }
       end
 
@@ -462,7 +466,7 @@ describe "/events", :type => :request do
         { "event" => { "type" => "events",
                        "id" => uuid,
                        "attributes" => {
-                         "source-token" => "123" } } }
+                         "sourceToken" => "123" } } }
       end
 
       it "JSON" do

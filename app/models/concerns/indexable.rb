@@ -49,17 +49,26 @@ module Indexable
       })
     end
 
+    def normalize_doi(doi)
+      doi = Array(/\A(?:(http|https):\/(\/)?(dx\.)?(doi.org|handle.test.datacite.org)\/)?(doi:)?(10\.\d{4,5}\/.+)\z/.match(doi)).last
+      doi = doi.delete("\u200B").downcase if doi.present?
+      "https://doi.org/#{doi}" if doi.present?
+    end
+
     def find_by_ids(ids, options={})
-      options[:cursor] ||= -1
+      dois = ids.split(",").map do |doi|
+        normalize_doi(doi).to_s
+      end
+
+      options[:cursor] ||= nil
 
       __elasticsearch__.search({
         size: 1000,
         from: 0,
-        search_after: options[:cursor],
         sort: [{ updated_at: { order: 'asc' }}],
         query: {
           terms: {
-            obj_id: ids.split(",").map(&:upcase)
+            obj_id: dois
           }
         },
         aggregations: query_aggregations
@@ -83,11 +92,12 @@ module Indexable
       must << { term: { obj_id: options[:obj_id] }} if options[:obj_id].present?
       must << { term: { citation_type: options[:citation_type] }} if options[:citation_type].present?
       must << { term: { year_month: options[:year_month] }} if options[:year_month].present?
-      must << { range: { "subj.date_published" => { gte: "#{options[:publication_year].split("-").min}||/y", lte: "#{options[:publication_year].split("-").max}||/y", format: "yyyy" }}} if options[:publication_year].present?
+      must << { range: { "subj.datePublished" => { gte: "#{options[:publication_year].split("-").min}||/y", lte: "#{options[:publication_year].split("-").max}||/y", format: "yyyy" }}} if options[:publication_year].present?
       must << { range: { occurred_at: { gte: "#{options[:occurred_at].split("-").min}||/y", lte: "#{options[:occurred_at].split("-").max}||/y", format: "yyyy" }}} if options[:occurred_at].present?
       must << { terms: { prefix: options[:prefix].split(",") }} if options[:prefix].present?
       must << { terms: { doi: options[:doi].downcase.split(",") }} if options[:doi].present?
       must << { terms: { orcid: options[:orcid].split(",") }} if options[:orcid].present?
+      must << { terms: { isni: options[:isni].split(",") }} if options[:isni].present?
       must << { terms: { subtype: options[:subtype].split(",") }} if options[:subtype].present?
       must << { terms: { source_id: options[:source_id].split(",") }} if options[:source_id].present?
       must << { terms: { relation_type_id: options[:relation_type_id].split(",") }} if options[:relation_type_id].present?

@@ -71,24 +71,46 @@ class Event < ActiveRecord::Base
     indexes :prefix,           type: :keyword
     indexes :subtype,          type: :keyword
     indexes :citation_type,    type: :keyword
-    #indexes :issn,             type: :keyword
+    indexes :issn,             type: :keyword
     indexes :subj,             type: :object, properties: {
-      type: { type: :keyword },
-      id: { type: :keyword },
+      "@type" => { type: :keyword },
+      "@id" => { type: :keyword },
       uid: { type: :keyword },
       name: { type: :text },
-      author: { type: :object },
-      periodical: { type: :text },
-      alternate_name: { type: :text },
-      volume_number: { type: :keyword },
-      issue_number: { type: :keyword },
+      givenName: { type: :text },
+      familyName: { type: :text },
+      author: { type: :object, properties: {
+        "@type" => { type: :keyword },
+        "@id" => { type: :keyword },
+        name: { type: :text },
+        givenName: { type: :text },
+        familyName: { type: :text }
+      }},
+      periodical: { type: :object, properties: {
+        "@type" => { type: :keyword },
+        "@id" => { type: :keyword },
+        name: { type: :text },
+        "issn" => { type: :keyword }
+      }},
+      alternateName: { type: :text },
+      volumeNumber: { type: :keyword },
+      issueNumber: { type: :keyword },
       pagination: { type: :keyword },
-      publisher: { type: :keyword },
+      publisher: { type: :object, properties: {
+        "@type" => { type: :keyword },
+        "@id" => { type: :keyword },
+        name: { type: :text }
+      }},
+      funder: { type: :object, properties: {
+        "@type" => { type: :keyword },
+        "@id" => { type: :keyword },
+        name: { type: :text }
+      }},
+      proxyIdentifiers: { type: :keyword },
       version: { type: :keyword },
-      issn: { type: :keyword },
-      date_published: { type: :date, format: "date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
-      date_modified: { type: :date, format: "date_optional_time", ignore_malformed: true },
-      provider_id: { type: :keyword },
+      datePublished: { type: :date, format: "date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
+      dateModified: { type: :date, format: "date_optional_time", ignore_malformed: true },
+      registrantId: { type: :keyword },
       cache_key: { type: :keyword }
     }
     indexes :obj,               type: :object, properties: {
@@ -96,18 +118,40 @@ class Event < ActiveRecord::Base
       id: { type: :keyword },
       uid: { type: :keyword },
       name: { type: :text },
-      author: { type: :object },
-      periodical: { type: :text },
-      alternate_name: { type: :text },
-      volume_number: { type: :keyword },
-      issue_number: { type: :keyword },
+      givenName: { type: :text },
+      familyName: { type: :text },
+      author: { type: :object, properties: {
+        "@type" => { type: :keyword },
+        "@id" => { type: :keyword },
+        name: { type: :text },
+        givenName: { type: :text },
+        familyName: { type: :text }
+      }},
+      periodical: { type: :object, properties: {
+        "@type" => { type: :keyword },
+        "@id" => { type: :keyword },
+        name: { type: :text },
+        "issn" => { type: :keyword }
+      }},
+      alternateName: { type: :text },
+      volumeNumber: { type: :keyword },
+      issueNumber: { type: :keyword },
       pagination: { type: :keyword },
-      publisher: { type: :keyword },
+      publisher: { type: :object, properties: {
+        "@type" => { type: :keyword },
+        "@id" => { type: :keyword },
+        name: { type: :text }
+      }},
+      funder: { type: :object, properties: {
+        "@type" => { type: :keyword },
+        "@id" => { type: :keyword },
+        name: { type: :text }
+      }},
+      proxyIdentifiers: { type: :keyword },
       version: { type: :keyword },
-      issn: { type: :keyword },
-      date_published: { type: :date, format: "date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
-      date_modified: { type: :date, format: "date_optional_time", ignore_malformed: true },
-      provider_id: { type: :keyword },
+      datePublished: { type: :date, format: "date_optional_time||yyyy-MM-dd||yyyy-MM||yyyy", ignore_malformed: true },
+      dateModified: { type: :date, format: "date_optional_time", ignore_malformed: true },
+      registrantId: { type: :keyword },
       cache_key: { type: :keyword }
     }
     indexes :source_id,        type: :keyword
@@ -139,10 +183,11 @@ class Event < ActiveRecord::Base
       "subj" => subj.merge(cache_key: subj_cache_key),
       "obj" => obj.merge(cache_key: obj_cache_key),
       "doi" => doi,
+      "orcid" => orcid,
+      "issn" => issn,
       "prefix" => prefix,
       "subtype" => subtype,
       "citation_type" => citation_type,
-      #"issn" => issn,
       "source_id" => source_id,
       "source_token" => source_token,
       "message_action" => message_action,
@@ -175,7 +220,8 @@ class Event < ActiveRecord::Base
       registrants: { terms: { field: 'registrant_id', size: 50, min_doc_count: 1 }, aggs: { year: { date_histogram: { field: 'occurred_at', interval: 'year', min_doc_count: 1 }, aggs: { "total_by_year" => { sum: { field: 'total' }}}}} },
       pairings: { terms: { field: 'registrant_id', size: 50, min_doc_count: 1 }, aggs: { recipient: { terms: { field: 'registrant_id', size: 50, min_doc_count: 1 }, aggs: { "total" => { sum: { field: 'total' }}}}} },
       citation_types: { terms: { field: 'citation_type', size: 50, min_doc_count: 1 }, aggs: { year_months: { date_histogram: { field: 'occurred_at', interval: 'month', min_doc_count: 1 }, aggs: { "total_by_year_month" => { sum: { field: 'total' }}}}} },
-      relation_types: { terms: { field: 'relation_type_id', size: 50, min_doc_count: 1 }, aggs: { year_months: { date_histogram: { field: 'occurred_at', interval: 'month', min_doc_count: 1 }, aggs: { "total_by_year_month" => { sum: { field: 'total' }}}}} }
+      relation_types: { terms: { field: 'relation_type_id', size: 50, min_doc_count: 1 }, aggs: { year_months: { date_histogram: { field: 'occurred_at', interval: 'month', min_doc_count: 1 }, aggs: { "total_by_year_month" => { sum: { field: 'total' }}}}} },
+      dois: { terms: { field: 'obj_id', size: 50, min_doc_count: 1 }, aggs: { relation_types: { terms: { field: 'relation_type_id',size: 50, min_doc_count: 1 }, aggs: { "total_by_type" => { sum: { field: 'total' }}}}} }
     }
   end
 
@@ -242,8 +288,8 @@ class Event < ActiveRecord::Base
                "type" => "events",
                "state" => aasm_state,
                "errors" => error_messages,
-               "message_action" => message_action,
-               "source_token" => source_token,
+               "messageAction" => message_action,
+               "sourceToken" => source_token,
                "total" => total,
                "timestamp" => timestamp }}
     Maremma.post(callback, data: data.to_json, token: ENV['API_KEY'])
@@ -262,6 +308,10 @@ class Event < ActiveRecord::Base
   end
 
   def doi
+    Array.wrap(subj["proxyIdentifiers"]).grep(/\A10\.\d{4,5}\/.+\z/) { $1 } +
+    Array.wrap(obj["proxyIdentifiers"]).grep(/\A10\.\d{4,5}\/.+\z/) { $1 } +
+    Array.wrap(subj["funder"]).map { |f| doi_from_url(f["@id"]) }.compact +
+    Array.wrap(obj["funder"]).map { |f| doi_from_url(f["@id"]) }.compact +
     [doi_from_url(subj_id), doi_from_url(obj_id)].compact
   end
 
@@ -270,25 +320,30 @@ class Event < ActiveRecord::Base
   end
 
   def orcid
+    Array.wrap(subj["author"]).map { |f| orcid_from_url(f["@id"]) }.compact +
+    Array.wrap(obj["author"]).map { |f| orcid_from_url(f["@id"]) }.compact +
     [orcid_from_url(subj_id), orcid_from_url(obj_id)].compact
   end
 
   def issn
-    (Array.wrap(subj["issn"]) + Array.wrap(obj["issn"])).compact
+    Array.wrap(subj.dig("periodical", "issn")).compact + 
+    Array.wrap(obj.dig("periodical", "issn")).compact
+  rescue TypeError
+    nil
   end
 
   def registrant_id
-    [subj["provider_id"], obj["provider_id"]].compact
+    [subj["registrantId"], obj["registrantId"], subj["provider_id"], obj["provider_id"]].compact
   end
 
   def subtype
-    [subj["type"], obj["type"]].compact
+    [subj["@type"], obj["@type"]].compact
   end
 
   def citation_type
-    return nil if subj["type"].blank? || subj["type"] == "creative-work" || obj["type"].blank? || obj["type"] == "creative-work"
+    return nil if subj["@type"].blank? || subj["@type"] == "CreativeWork" || obj["@type"].blank? || obj["@type"] == "CreativeWork"
 
-   [subj["type"], obj["type"]].compact.sort.join("-")
+   [subj["@type"], obj["@type"]].compact.sort.join("-")
   end
 
   def doi_from_url(url)
@@ -316,12 +371,12 @@ class Event < ActiveRecord::Base
   end
 
   def subj_cache_key
-    timestamp = subj["date_modified"] || Time.zone.now.iso8601
+    timestamp = subj["dateModified"] || Time.zone.now.iso8601
     "objects/#{subj_id}-#{timestamp}"
   end
 
   def obj_cache_key
-    timestamp = obj["date_modified"] || Time.zone.now.iso8601
+    timestamp = obj["dateModified"] || Time.zone.now.iso8601
     "objects/#{obj_id}-#{timestamp}"
   end
 

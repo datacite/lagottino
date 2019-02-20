@@ -5,14 +5,14 @@ FactoryBot.define do
     source_token { "citeulike_123" }
     sequence(:subj_id) { |n| "http://www.citeulike.org/user/dbogartoit/#{n}" }
     obj_id { "http://doi.org/10.1371/journal.pmed.0030186" }
-    subj {{ "id"=>"http://www.citeulike.org/user/dbogartoit",
+    subj {{ "@id"=>"http://www.citeulike.org/user/dbogartoit",
+            "@type"=>"CreativeWork",
             "uid"=>"http://www.citeulike.org/user/dbogartoit",
             "author"=>[{ "given"=>"dbogartoit" }],
             "name"=>"CiteULike bookmarks for user dbogartoit",
             "publisher"=>"CiteULike",
             "date-published"=>"2006-06-13T16:14:19Z",
-            "url"=>"http://www.citeulike.org/user/dbogartoit",
-            "type"=>"entry" }}
+            "url"=>"http://www.citeulike.org/user/dbogartoit" }}
     obj {}
     relation_type_id { "bookmarks" }
     updated_at { Time.zone.now }

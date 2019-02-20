@@ -30,7 +30,7 @@ class ApplicationController < ActionController::API
   # deep_transform_keys has been removed in Rails 5.1
   # https://stackoverflow.com/questions/35812277/fields-parameters-with-hyphen-in-ruby-on-rails
   def transform_params
-    params.transform_keys! { |key| key.tr('-', '_') }
+    params.transform_keys! { |key| key.underscore }
   end
 
   def default_format_json
@@ -74,6 +74,8 @@ class ApplicationController < ActionController::API
         message = "The content type is not recognized."
       elsif status == 409
         message = "The resource already exists."
+      elsif ["JSON::ParserError", "Nokogiri::XML::SyntaxError"].include?(exception.class.to_s)
+        message = exception.message
       else
         Bugsnag.notify(exception)
 

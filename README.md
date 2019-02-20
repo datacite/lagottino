@@ -17,6 +17,22 @@ docker-compose up
 
 You can now point your browser to `http://localhost:8085` and use the application. Some API endpoints require authentication.
 
+To populate the database and index with resources:
+
+```bash
+bundle exec rake elasticsearch:event:create_index
+bundle exec rake elasticsearch:event:import
+bundle exec rake event:index
+
+```
+
+To delete events by subj-id, for example events with subj-id 'https://doi.org/10.1007/s10680-018-9485-1':
+
+```bash
+bundle exec rake event:detete_by_sub_id[https://doi.org/10.1007/s10680-018-9485-1]
+
+```
+
 ## Development
 
 We use Rspec for testing:

@@ -24,7 +24,7 @@ gem 'kaminari', '~> 1.0', '>= 1.0.1'
 gem 'base32-url', '~> 0.3'
 gem 'mailgun-ruby', '~> 1.1', '>= 1.1.8'
 gem 'aasm', '~> 4.12', '>= 4.12.3'
-gem 'shoryuken', '~> 3.2', '>= 3.2.2'
+gem 'shoryuken', '~> 4.0'
 gem "aws-sdk-s3", require: false
 gem 'aws-sdk-sqs', '~> 1.3'
 gem 'bugsnag', '~> 6.1', '>= 6.1.1'
