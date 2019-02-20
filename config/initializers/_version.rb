@@ -1,5 +1,5 @@
 module Lagottino
   class Application
-    VERSION = '0.15.2'
+    VERSION = '0.16'
   end
 end
