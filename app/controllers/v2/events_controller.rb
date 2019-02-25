@@ -109,7 +109,9 @@ class V2::EventsController < ApplicationController
     end
 
     total = response.results.total
-    total_pages = page[:size] > 0 ? (total.to_f / page[:size]).ceil : 0
+    total_for_pages = page[:cursor].present? ? total.to_f : [total.to_f, 10000].min
+    total_pages = page[:size] > 0 ? (total_for_pages / page[:size]).ceil : 0
+
     sources = total > 0 ? facet_by_source(response.response.aggregations.sources.buckets) : nil
     prefixes = total > 0 ? facet_by_source(response.response.aggregations.prefixes.buckets) : nil
     citation_types = total > 0 ? facet_by_citation_type(response.response.aggregations.citation_types.buckets) : nil
@@ -124,6 +126,7 @@ class V2::EventsController < ApplicationController
     options[:meta] = {
       total: total,
       "totalPages" => total_pages,
+      page: page[:cursor].blank? && page[:number].present? ? page[:number] : nil,
       sources: sources,
       prefixes: prefixes,
       "citationTypes" => citation_types,
@@ -150,8 +153,9 @@ class V2::EventsController < ApplicationController
         "registrant-id" => params[:registrant_id],
         "publication-year" => params[:publication_year],
         "year-month" => params[:year_month],
-        "page[cursor]" => @events.last[:sort].first,
-        "page[size]" => params.dig(:page, :size) }.compact.to_query
+        "page[cursor]" => page[:cursor].present? ? Array.wrap(@events.last[:sort]).first : nil,
+        "page[number]" => page[:cursor].blank? && page[:number].present? ? page[:number] + 1 : nil,
+        "page[size]" => page[:size] }.compact.to_query
       }.compact
     options[:include] = @include
     options[:is_collection] = true

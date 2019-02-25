@@ -79,7 +79,7 @@ module Indexable
       if options.dig(:page, :cursor).present?
         from = 0
         search_after = [options.dig(:page, :cursor)]
-        sort = [{ updated_at: { order: 'asc' }}]
+        sort = [{ _id: { order: 'asc' }}]
       else
         from = (options.dig(:page, :number) - 1) * options.dig(:page, :size)
         search_after = nil
