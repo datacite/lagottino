@@ -9,6 +9,7 @@ services:
     build: .
     ports:
       - "8085:80"
+      - "2285:22"
     volumes:
       - ./app:/home/app/webapp/app
       - ./config:/home/app/webapp/config
