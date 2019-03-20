@@ -27,7 +27,7 @@ gem 'aasm', '~> 4.12', '>= 4.12.3'
 gem 'shoryuken', '~> 4.0'
 gem "aws-sdk-s3", require: false
 gem 'aws-sdk-sqs', '~> 1.3'
-gem 'bugsnag', '~> 6.1', '>= 6.1.1'
+gem 'sentry-raven', '~> 2.9'
 gem 'strip_attributes', '~> 1.8'
 gem 'slack-notifier', '~> 2.1'
 gem 'mini_magick', '~> 4.8'
@@ -39,6 +39,7 @@ gem 'elasticsearch-rails', '~> 6.0', '>= 6.0.0'
 gem 'faraday_middleware-aws-sigv4', '~> 0.2.4'
 gem 'rack-utf8_sanitizer', '~> 1.6'
 gem 'oj_mimic_json', '~> 1.0', '>= 1.0.1'
+gem 'git', '~> 1.5'
 
 group :development, :test do
   gem 'rspec-rails', '~> 3.5', '>= 3.5.2'
