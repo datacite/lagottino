@@ -1,11 +1,9 @@
 source 'https://rubygems.org'
-git_source(:github) { |repo| "https://github.com/#{repo}.git" }
-
-# ruby '2.4.4'
 
 gem 'rails', '~> 5.2.0'
 gem 'mysql2', '~> 0.4.4'
 gem 'dotenv'
+gem 'rake', '~> 12.0'
 gem 'multi_json'
 gem 'json', '~> 1.8', '>= 1.8.5'
 gem 'oj', '~> 2.18', '>= 2.18.1'
