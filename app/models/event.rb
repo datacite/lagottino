@@ -10,7 +10,7 @@ class Event < ActiveRecord::Base
 
   # include helper module for Elasticsearch
   include Indexable
-  
+
   include Elasticsearch::Model
 
   before_validation :set_defaults
@@ -221,7 +221,12 @@ class Event < ActiveRecord::Base
       pairings: { terms: { field: 'registrant_id', size: 50, min_doc_count: 1 }, aggs: { recipient: { terms: { field: 'registrant_id', size: 50, min_doc_count: 1 }, aggs: { "total" => { sum: { field: 'total' }}}}} },
       citation_types: { terms: { field: 'citation_type', size: 50, min_doc_count: 1 }, aggs: { year_months: { date_histogram: { field: 'occurred_at', interval: 'month', min_doc_count: 1 }, aggs: { "total_by_year_month" => { sum: { field: 'total' }}}}} },
       relation_types: { terms: { field: 'relation_type_id', size: 50, min_doc_count: 1 }, aggs: { year_months: { date_histogram: { field: 'occurred_at', interval: 'month', min_doc_count: 1 }, aggs: { "total_by_year_month" => { sum: { field: 'total' }}}}} },
-      dois: { terms: { field: 'obj_id', size: 50, min_doc_count: 1 }, aggs: { relation_types: { terms: { field: 'relation_type_id',size: 50, min_doc_count: 1 }, aggs: { "total_by_type" => { sum: { field: 'total' }}}}} }
+      dois: { terms: { field: 'obj_id', size: 50, min_doc_count: 1 }, aggs: { relation_types: { terms: { field: 'relation_type_id',size: 50, min_doc_count: 1 }, aggs: { "total_by_type" => { sum: { field: 'total' }}}}} },
+      dois_usage: {
+        filter: { script: { script: "doc['source_id'].value == 'datacite-usage' && doc['occurred_at'].value.getMillis() >= doc['obj.datePublished'].value.getMillis() && doc['occurred_at'].value.getMillis() < new Date().getTime()" }},
+        aggs: {
+          dois: { terms: { field: 'obj_id', size: 50, min_doc_count: 1 }, aggs: { relation_types: { terms: { field: 'relation_type_id',size: 50, min_doc_count: 1 }, aggs: { "total_by_type" => { sum: { field: 'total' }}}}} } }
+        }
     }
   end
 
@@ -326,7 +331,7 @@ class Event < ActiveRecord::Base
   end
 
   def issn
-    Array.wrap(subj.dig("periodical", "issn")).compact + 
+    Array.wrap(subj.dig("periodical", "issn")).compact +
     Array.wrap(obj.dig("periodical", "issn")).compact
   rescue TypeError
     nil
@@ -388,7 +393,7 @@ class Event < ActiveRecord::Base
     # make sure subj and obj have correct id
     self.subj = subj.to_h.merge("id" => self.subj_id)
     self.obj = obj.to_h.merge("id" => self.obj_id)
-    
+
     self.total = 1 if total.blank?
     self.relation_type_id = "references" if relation_type_id.blank?
     self.occurred_at = Time.zone.now.utc if occurred_at.blank?
