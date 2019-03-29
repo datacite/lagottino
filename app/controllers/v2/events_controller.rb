@@ -103,6 +103,7 @@ class V2::EventsController < ApplicationController
                              relation_type_id: params[:relation_type_id],
                              issn: params[:issn],
                              publication_year: params[:publication_year],
+                             occurred_at: params[:occurred_at],
                              year_month: params[:year_month],
                              page: page,
                              sort: sort)
