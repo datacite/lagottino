@@ -156,7 +156,7 @@ class V2::EventsController < ApplicationController
         "registrant-id" => params[:registrant_id],
         "publication-year" => params[:publication_year],
         "year-month" => params[:year_month],
-        "page[cursor]" => page[:cursor].present? ? Array.wrap(@events.last[:sort]).first : nil,
+        "page[cursor]" => page[:cursor].present? ? Array.wrap(@events.to_a.last[:sort]).first : nil,
         "page[number]" => page[:cursor].blank? && page[:number].present? ? page[:number] + 1 : nil,
         "page[size]" => page[:size] }.compact.to_query
       }.compact
