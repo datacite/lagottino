@@ -119,7 +119,7 @@ class V1::EventsController < ApplicationController
     registrants = total > 0  && params[:extra] ? facet_by_registrants(response.response.aggregations.registrants.buckets) : nil   
     pairings = total > 0 && params[:extra] ? facet_by_pairings(response.response.aggregations.pairings.buckets) : nil
 
-    @events = response.results.results
+    @events = response.results
 
     options = {}
     options[:meta] = {
