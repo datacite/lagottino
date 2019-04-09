@@ -25,7 +25,7 @@ class V2::EventsController < ApplicationController
     if @event.update_attributes(safe_params)
       options = {}
       options[:is_collection] = false
-      
+
       render json: V2::EventSerializer.new(@event, options).serialized_json, status: exists ? :ok : :created
     else
       errors = @event.errors.full_messages.map { |message| { status: 422, title: message } }
@@ -45,7 +45,7 @@ class V2::EventsController < ApplicationController
     if @event.update_attributes(safe_params)
       options = {}
       options[:is_collection] = false
-      
+
       render json: V2::EventSerializer.new(@event, options).serialized_json, status: exists ? :ok : :created
     else
       errors = @event.errors.full_messages.map { |message| { status: 422, title: message } }
@@ -76,7 +76,7 @@ class V2::EventsController < ApplicationController
            end
 
     page = params[:page] || {}
-    if page[:size].present? 
+    if page[:size].present?
       page[:size] = [page[:size].to_i, 1000].min
       max_number = 1
     else
@@ -86,7 +86,7 @@ class V2::EventsController < ApplicationController
     page[:number] = page[:number].to_i > 0 ? [page[:number].to_i, max_number].min : 1
 
     if params[:id].present?
-      response = Event.find_by_id(params[:id]) 
+      response = Event.find_by_id(params[:id])
     elsif params[:ids].present?
       response = Event.find_by_ids(params[:ids], page: page, sort: sort)
     else
@@ -98,12 +98,13 @@ class V2::EventsController < ApplicationController
                              prefix: params[:prefix],
                              subtype: params[:subtype],
                              citation_type: params[:citation_type],
-                             source_id: params[:source_id], 
+                             source_id: params[:source_id],
                              registrant_id: params[:registrant_id],
                              relation_type_id: params[:relation_type_id],
                              issn: params[:issn],
-                             publication_year: params[:publication_year], 
-                             year_month: params[:year_month], 
+                             publication_year: params[:publication_year],
+                             occurred_at: params[:occurred_at],
+                             year_month: params[:year_month],
                              page: page,
                              sort: sort)
     end
@@ -115,10 +116,11 @@ class V2::EventsController < ApplicationController
     sources = total > 0 ? facet_by_source(response.response.aggregations.sources.buckets) : nil
     prefixes = total > 0 ? facet_by_source(response.response.aggregations.prefixes.buckets) : nil
     citation_types = total > 0 ? facet_by_citation_type(response.response.aggregations.citation_types.buckets) : nil
-    relation_types = total > 0 ? facet_by_relation_type(response.response.aggregations.relation_types.buckets) : nil  
-    registrants = total > 0  && params[:extra] ? facet_by_registrants(response.response.aggregations.registrants.buckets) : nil   
+    relation_types = total > 0 ? facet_by_relation_type(response.response.aggregations.relation_types.buckets) : nil
+    registrants = total > 0  && params[:extra] ? facet_by_registrants(response.response.aggregations.registrants.buckets) : nil
     pairings = total > 0 && params[:extra] ? facet_by_pairings(response.response.aggregations.pairings.buckets) : nil
     dois = total > 0 && params[:extra] ? facet_by_dois(response.response.aggregations.dois.buckets) : nil
+    dois_usage = total > 0 && params[:extra] ? facet_by_dois(response.response.aggregations.dois_usage.dois.buckets) : nil
 
     @events = response.results.results
 
@@ -133,7 +135,8 @@ class V2::EventsController < ApplicationController
       "relationTypes" => relation_types,
       pairings: pairings,
       registrants: registrants,
-      "doisRelationTypes": dois
+      "doisRelationTypes": dois,
+      "doisUsageTypes": dois_usage
     }.compact
 
     options[:links] = {
