@@ -10,12 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_10_26_164009) do
+ActiveRecord::Schema.define(version: 2019_04_11_110202) do
 
   create_table "events", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.text "uuid", null: false
-    t.string "subj_id", limit: 191, null: false
-    t.string "obj_id", limit: 191
+    t.string "subj_id", null: false
+    t.string "obj_id"
     t.string "source_id", limit: 191
     t.string "aasm_state"
     t.string "state_event"
