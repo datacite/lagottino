@@ -71,6 +71,32 @@ describe "/events", :type => :request do
       end
     end
 
+
+    context "with very long url" do
+      let(:url) {"http://navigator.eumetsat.int/soapservices/cswstartup?service=csw&version=2.0.2&request=getrecordbyid&outputschema=http%3A%2F%2Fwww.isotc211.org%2F2005%2Fgmd&id=eo%3Aeum%3Adat%3Amult%3Arac-m11-iasia"}
+      let(:params) do
+        { "data" => { "type" => "events",
+                      "attributes" => {
+                        "subjId" => event.subj_id,
+                        "subj" => event.subj,
+                        "objId" => url,
+                        "relationTypeId" => event.relation_type_id,
+                        "sourceId" => "datacite-url",
+                        "sourceToken" => event.source_token } } }
+      end
+
+      it "JSON" do
+        post uri, params, headers
+
+        expect(last_response.status).to eq(201)
+
+        response = JSON.parse(last_response.body)
+        expect(response["errors"]).to be_nil
+        expect(response.dig("data", "id")).not_to eq(event.uuid)
+        expect(response.dig("data", "attributes", "objId")).to eq(url)
+      end
+    end
+
     context "as staff user" do
       let(:token) { User.generate_token(role_id: "staff_user") }
 
