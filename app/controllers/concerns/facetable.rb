@@ -60,7 +60,7 @@ module Facetable
 
         { "id" => hsh["key"],
           "title" => hsh["key"],
-          "count" => hsh["doc_count"],
+          "count" => hsh.dig("sum_distribution", "value"),
           "yearMonths" => arr }
       end
     end
@@ -79,7 +79,7 @@ module Facetable
 
         { "id" => hsh["key"],
           "title" => hsh["key"],
-          "count" => hsh["doc_count"],
+          "count" => hsh.dig("sum_distribution", "value"),
           "year-months" => arr }
       end
     end
