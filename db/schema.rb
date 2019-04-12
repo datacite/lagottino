@@ -10,12 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_11_110202) do
+ActiveRecord::Schema.define(version: 2019_04_12_065918) do
 
-  create_table "events", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.text "uuid", null: false
-    t.string "subj_id", null: false
-    t.string "obj_id"
+    t.text "subj_id", null: false
+    t.text "obj_id"
     t.string "source_id", limit: 191
     t.string "aasm_state"
     t.string "state_event"
@@ -34,7 +34,7 @@ ActiveRecord::Schema.define(version: 2019_04_11_110202) do
     t.string "license", limit: 191
     t.index ["created_at", "indexed_at", "updated_at"], name: "index_events_on_created_indexed_updated"
     t.index ["source_id", "created_at"], name: "index_events_on_source_id_created_at"
-    t.index ["subj_id", "obj_id", "source_id", "relation_type_id"], name: "index_events_on_multiple_columns", unique: true
+    t.index ["subj_id", "obj_id", "source_id", "relation_type_id"], name: "index_events_on_multiple_columns", unique: true, length: { subj_id: 199, obj_id: 40 }
     t.index ["updated_at"], name: "index_events_on_updated_at"
     t.index ["uuid"], name: "index_events_on_uuid", unique: true, length: 36
   end
