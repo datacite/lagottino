@@ -9,6 +9,7 @@ module Facetable
     "datacite-cnki" => "DataCite to CNKI",
     "datacite-istic" => "DataCite to ISTIC",
     "datacite-medra" => "DataCite to mEDRA",
+    "datacite-resolution" => "DataCite Resolution Stats",
     "datacite-op" => "DataCite to OP",
     "datacite-jalc" => "DataCite to JaLC",
     "datacite-airiti" => "DataCite to Airiti",
