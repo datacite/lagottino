@@ -121,7 +121,7 @@ class V2::EventsController < ApplicationController
     pairings = total.positive? && params[:extra] ? facet_by_pairings(response.response.aggregations.pairings.buckets) : nil
     dois = total.positive? && params[:extra] ? facet_by_dois(response.response.aggregations.dois.buckets) : nil
     dois_usage = total.positive? && params[:extra] ? facet_by_dois(response.response.aggregations.dois_usage.dois.buckets) : nil
-    dois_citations = total.positive? && params[:extra] ? facet_citations_by_month(response.response.aggregations.dois_citations) : nil
+    dois_citations = total.positive? && params[:extra] ? facet_citations_by_year(response.response.aggregations.dois_citations) : nil
 
     @events = response.results.results
 
