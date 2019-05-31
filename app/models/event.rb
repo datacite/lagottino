@@ -55,6 +55,20 @@ class Event < ActiveRecord::Base
   serialize :obj, JSON
   serialize :error_messages, JSON
 
+
+  INCLUDED_RELATION_TYPES = [
+    "cites", "is-cited-by",
+    "compiles", "is-compiled-by",
+    "documents", "is-documented-by",
+    "has-metadata", "is-metadata-for",
+    "is-supplement-to", "is-supplemented-by",
+    "is-derived-from", "is-source-of",
+    "references", "is-referenced-by",
+    "reviews", "is-reviewed-by",
+    "requires", "is-required-by",
+    "describes", "is-described-by"
+  ]
+
   validates :subj_id, :source_id, :source_token, presence: true
 
   attr_accessor :container_title, :url
@@ -232,7 +246,15 @@ class Event < ActiveRecord::Base
         filter: { script: { script: "doc['source_id'].value == 'datacite-usage' && doc['occurred_at'].value.getMillis() >= doc['obj.datePublished'].value.getMillis() && doc['occurred_at'].value.getMillis() < new Date().getTime()" }},
         aggs: {
           dois: { terms: { field: 'obj_id', size: 50, min_doc_count: 1 }, aggs: { relation_types: { terms: { field: 'relation_type_id',size: 50, min_doc_count: 1 }, aggs: { "total_by_type" => { sum: { field: 'total' }}}}} } }
-        }
+      },
+      dois_citations: {
+        filter: {
+          script: {
+            script: "#{INCLUDED_RELATION_TYPES}.contains(doc['relation_type_id'].value)"
+          }
+        },
+        aggs: { year_months: { date_histogram: { field: 'occurred_at', interval: 'month', min_doc_count: 1 }, aggs: { "total_by_year_month" => { sum: { field: 'total' }}}},"sum_distribution"=>sum_distribution}
+      }
     }
   end
 
