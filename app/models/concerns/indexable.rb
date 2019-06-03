@@ -68,7 +68,7 @@ module Indexable
         sort: [{ updated_at: { order: 'asc' }}],
         query: {
           terms: {
-            obj_id: dois
+            doi: dois
           }
         },
         aggregations: query_aggregations
