@@ -8,4 +8,12 @@ class V2::ObjectSerializer
   attribute :subtype do |object|
     object["@type"]
   end
+
+  attribute :datePublished do |object|
+    object.date_published
+  end
+
+  attribute :registrantId do |object|
+    object.registrant_id
+  end
 end
