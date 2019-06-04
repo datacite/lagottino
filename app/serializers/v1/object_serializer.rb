@@ -6,6 +6,6 @@ class V1::ObjectSerializer
   attributes :subtype, :name, :author, :periodical, :volume_number, :issue_number, :pagination, :publisher, :issn, :version, :date_published
 
   attribute :subtype do |object|
-    object.type
+    object["@type"]
   end
 end
