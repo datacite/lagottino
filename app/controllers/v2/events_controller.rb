@@ -75,15 +75,9 @@ class V2::EventsController < ApplicationController
            else { updated_at: { order: 'asc' }}
            end
 
-    page = params[:page] || {}
-    if page[:size].present?
-      page[:size] = [page[:size].to_i, 1000].min
-      max_number = 1
-    else
-      page[:size] = 1000
-      max_number = 10000/page[:size]
-    end
-    page[:number] = page[:number].to_i > 0 ? [page[:number].to_i, max_number].min : 1
+    # page = params[:page] || {}
+
+    page = page_from_params(params)
 
     if params[:id].present?
       response = Event.find_by_id(params[:id])
