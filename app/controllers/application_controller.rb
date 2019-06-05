@@ -3,6 +3,9 @@ class ApplicationController < ActionController::API
   include CanCan::ControllerAdditions
   include ErrorSerializable
 
+  # include helper module for pagination
+  include Paginatable
+
   attr_accessor :current_user
 
   before_action :default_format_json, :transform_params, :set_raven_context
