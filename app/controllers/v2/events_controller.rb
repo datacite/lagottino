@@ -72,6 +72,7 @@ class V2::EventsController < ApplicationController
            when "-created" then { created_at: { order: 'desc' }}
            when "updated" then { updated_at: { order: 'asc' }}
            when "-updated" then { updated_at: { order: 'desc' }}
+           when "relation_type_id" then { relation_type_id: { order: 'asc' }}
            else { updated_at: { order: 'asc' }}
            end
 
